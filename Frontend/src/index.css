@@ -1,0 +1,382 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Happy Pastel Design System */
+@layer base {
+  :root {
+    /* Happy Pastel Color Palette */
+    --baby-blue: 205 65% 79%;
+    --cream: 60 50% 97%;
+    --soft-peach: 355 76% 86%;
+    --pink-pastel: 326 43% 71%;
+    --lavender: 320 30% 72%;
+    
+    /* Division Colors */
+    --wakahim: 45 90% 75%;
+    --sekretaris: 205 65% 79%;
+    --bendahara: 355 76% 86%;
+    --personalia: 326 43% 71%;
+    --ekraf: 320 30% 72%;
+    --psdm: 25 85% 70%;
+    --mikat: 145 50% 65%;
+    --sosma: 25 40% 55%;
+    --rnd: 220 10% 65%;
+    --medinfo: 220 60% 45%;
+    
+    /* WhatsApp Green Pastel */
+    --whatsapp: 142 50% 55%;
+    --whatsapp-pastel: 142 40% 75%;
+    
+    /* Semantic Colors */
+    --background: 60 50% 97%;
+    --foreground: 220 25% 25%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 25%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 25%;
+    
+    --primary: 326 43% 71%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 205 65% 79%;
+    --secondary-foreground: 220 25% 25%;
+    
+    --muted: 60 30% 94%;
+    --muted-foreground: 220 15% 50%;
+    
+    --accent: 320 30% 72%;
+    --accent-foreground: 220 25% 25%;
+    
+    --destructive: 0 65% 65%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 220 20% 88%;
+    --input: 205 50% 90%;
+    --ring: 326 43% 71%;
+    
+    --radius: 1.25rem;
+    
+    /* Sidebar - Baby Blue to Cream Gradient */
+    --sidebar-background: 205 65% 79%;
+    --sidebar-foreground: 220 25% 25%;
+    --sidebar-primary: 326 43% 71%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 205 65% 85%;
+    --sidebar-accent-foreground: 220 25% 25%;
+    --sidebar-border: 205 50% 75%;
+    --sidebar-ring: 326 43% 71%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(205 65% 79%) 0%, hsl(326 43% 71%) 100%);
+    --gradient-button: linear-gradient(135deg, hsl(205 65% 79%) 0%, hsl(320 30% 72%) 100%);
+    --gradient-sidebar: linear-gradient(180deg, hsl(205 65% 82%) 0%, hsl(60 50% 97%) 100%);
+    --gradient-login-bg: linear-gradient(135deg, hsl(205 65% 85%) 0%, hsl(326 43% 80%) 50%, hsl(320 30% 82%) 100%);
+    
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -5px hsl(220 30% 70% / 0.3);
+    --shadow-card: 0 8px 30px -10px hsl(220 30% 60% / 0.2);
+    --shadow-button: 0 4px 15px -3px hsl(326 43% 71% / 0.4);
+  }
+
+  .dark {
+    --background: 220 25% 12%;
+    --foreground: 60 50% 97%;
+    
+    --card: 220 25% 16%;
+    --card-foreground: 60 50% 97%;
+    
+    --popover: 220 25% 16%;
+    --popover-foreground: 60 50% 97%;
+    
+    --primary: 326 43% 71%;
+    --primary-foreground: 220 25% 15%;
+    
+    --secondary: 205 40% 35%;
+    --secondary-foreground: 60 50% 97%;
+    
+    --muted: 220 20% 20%;
+    --muted-foreground: 220 15% 65%;
+    
+    --accent: 320 30% 50%;
+    --accent-foreground: 60 50% 97%;
+    
+    --border: 220 20% 25%;
+    --input: 220 20% 25%;
+    --ring: 326 43% 71%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-nunito antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
+  }
+}
+
+@layer components {
+  /* Pastel Cards */
+  .card-pastel {
+    @apply bg-card rounded-3xl shadow-soft transition-all duration-300;
+  }
+  
+  .card-pastel:hover {
+    @apply shadow-card transform -translate-y-1;
+  }
+  
+  /* Pastel Input */
+  .input-pastel {
+    @apply bg-baby-blue/20 border-0 rounded-2xl px-5 py-3 focus:ring-2 focus:ring-pink-pastel/50 transition-all duration-200;
+  }
+  
+  /* Gradient Button */
+  .btn-gradient {
+    @apply bg-gradient-to-r from-baby-blue to-pink-pastel text-white font-semibold rounded-full px-8 py-3 shadow-button transition-all duration-300;
+  }
+  
+  .btn-gradient:hover {
+    @apply transform scale-105 shadow-lg;
+  }
+  
+  /* WhatsApp Button */
+  .btn-whatsapp {
+    @apply bg-whatsapp-pastel text-green-800 font-medium rounded-full px-6 py-2.5 transition-all duration-200;
+  }
+  
+  .btn-whatsapp:hover {
+    @apply bg-whatsapp text-white;
+  }
+  
+  /* Section Indicator */
+  .section-indicator {
+    @apply w-1 h-6 rounded-full;
+    background: linear-gradient(to bottom, hsl(var(--baby-blue)), hsl(var(--pink-pastel)));
+  }
+  
+  /* Floating shapes for background */
+  .floating-shape {
+    @apply absolute rounded-full opacity-40 blur-xl;
+    animation: float 8s ease-in-out infinite;
+  }
+  
+  /* Robot animation */
+  .robot-idle {
+    animation: robotIdle 3s ease-in-out infinite;
+  }
+  
+  /* Menu item styles */
+  .menu-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 text-sidebar-foreground;
+  }
+  
+  .menu-item:hover {
+    @apply bg-white/50 text-sidebar-foreground;
+  }
+  
+  .menu-item.active {
+    @apply bg-pink-pastel text-white font-medium;
+  }
+  
+  /* Scrollbar styling */
+  .scrollbar-pastel::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollbar-pastel::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-pastel::-webkit-scrollbar-thumb {
+    background: hsl(var(--pink-pastel) / 0.3);
+    border-radius: 9999px;
+  }
+  
+  .scrollbar-pastel::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--pink-pastel) / 0.5);
+  }
+}
+
+@layer utilities {
+  /* Background utilities */
+  .bg-baby-blue {
+    background-color: hsl(var(--baby-blue));
+  }
+  
+  .bg-cream {
+    background-color: hsl(var(--cream));
+  }
+  
+  .bg-soft-peach {
+    background-color: hsl(var(--soft-peach));
+  }
+  
+  .bg-pink-pastel {
+    background-color: hsl(var(--pink-pastel));
+  }
+  
+  .bg-lavender {
+    background-color: hsl(var(--lavender));
+  }
+  
+  .bg-whatsapp-pastel {
+    background-color: hsl(var(--whatsapp-pastel));
+  }
+  
+  .bg-whatsapp {
+    background-color: hsl(var(--whatsapp));
+  }
+  
+  /* Text utilities */
+  .text-baby-blue {
+    color: hsl(var(--baby-blue));
+  }
+  
+  .text-pink-pastel {
+    color: hsl(var(--pink-pastel));
+  }
+  
+  .text-lavender {
+    color: hsl(var(--lavender));
+  }
+  
+  .text-soft-peach {
+    color: hsl(var(--soft-peach));
+  }
+  
+  /* Division colors */
+  .bg-wakahim { background-color: hsl(var(--wakahim)); }
+  .bg-sekretaris { background-color: hsl(var(--sekretaris)); }
+  .bg-bendahara { background-color: hsl(var(--bendahara)); }
+  .bg-personalia { background-color: hsl(var(--personalia)); }
+  .bg-ekraf { background-color: hsl(var(--ekraf)); }
+  .bg-psdm { background-color: hsl(var(--psdm)); }
+  .bg-mikat { background-color: hsl(var(--mikat)); }
+  .bg-sosma { background-color: hsl(var(--sosma)); }
+  .bg-rnd { background-color: hsl(var(--rnd)); }
+  .bg-medinfo { background-color: hsl(var(--medinfo)); }
+  
+  /* Gradient backgrounds */
+  .bg-gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .bg-gradient-button {
+    background: var(--gradient-button);
+  }
+  
+  .bg-gradient-sidebar {
+    background: var(--gradient-sidebar);
+  }
+  
+  .bg-gradient-login {
+    background: var(--gradient-login-bg);
+  }
+  
+  /* Shadow utilities */
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+  
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+  
+  .shadow-button {
+    box-shadow: var(--shadow-button);
+  }
+  
+  /* Font */
+  .font-nunito {
+    font-family: 'Nunito', sans-serif;
+  }
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+}
+
+@keyframes robotIdle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.4s ease-out forwards;
+}
+
+/* Stagger animations for children */
+.stagger-children > * {
+  opacity: 0;
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.3s; }
+.stagger-children > *:nth-child(7) { animation-delay: 0.35s; }
+.stagger-children > *:nth-child(8) { animation-delay: 0.4s; }
