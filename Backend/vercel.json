@@ -1,8 +1,8 @@
 {
   "version": 2,
   "functions": {
-    "api/*.php": {
-      "runtime": "vercel-php@0.7.0"
+    "api/index.php": {
+      "runtime": "php@0.6.0"
     }
   },
   "routes": [
@@ -13,7 +13,6 @@
   ],
   "env": {
     "APP_ENV": "production",
-    "APP_DEBUG": "true",
-    "DB_CONNECTION": "mysql"
+    "APP_DEBUG": "true"
   }
 }
