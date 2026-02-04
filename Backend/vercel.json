@@ -1,9 +1,19 @@
 {
   "version": 2,
   "functions": {
-    "api/*.php": { "runtime": "vercel-php" }
+    "api/*.php": {
+      "runtime": "vercel-php@0.7.0"
+    }
   },
   "routes": [
-    { "src": "/(.*)", "dest": "/api/index.php" }
-  ]
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.php"
+    }
+  ],
+  "env": {
+    "APP_ENV": "production",
+    "APP_DEBUG": "true",
+    "DB_CONNECTION": "mysql"
+  }
 }
