@@ -15,5 +15,6 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::get('/prokers', [ProkerController::class, 'index']);
 Route::post('/prokers', [ProkerController::class, 'store']);
+Route::put('/prokers/{id}', [ProkerController::class, 'update']);
 Route::delete('/prokers/{id}', [ProkerController::class, 'destroy']);
 });
