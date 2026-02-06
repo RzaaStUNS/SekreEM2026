@@ -1,38 +1,31 @@
 <?php
-// Nyalakan semua error reporting PHP
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
-echo "<h1>🕵️‍♂️ Detektif Server Vercel</h1>";
+// 1. Panggil Autoload (Otak Laravel)
+require __DIR__ . '/../vendor/autoload.php';
 
-// 1. Cek Folder Vendor (Otak Laravel)
-echo "<h3>1. Cek Folder Vendor</h3>";
-$vendorPath = __DIR__ . '/../vendor/autoload.php';
-if (file_exists($vendorPath)) {
-    echo "✅ Vendor ditemukan di: " . realpath($vendorPath) . "<br>";
-    echo "   (Artinya 'composer install' berhasil)";
-} else {
-    echo "❌ CRITICAL: File autoload.php TIDAK ADA! <br>";
-    echo "   (Artinya folder 'vendor' hilang/kosong. Build gagal install dependency.)";
+// 2. Mulai Aplikasi
+$app = require_once __DIR__ . '/../bootstrap/app.php';
+
+// --- PENTING: MENGATASI READ-ONLY VERCEL ---
+// Kita paksa Laravel menggunakan folder sementara (/tmp) 
+// untuk menyimpan cache, log, dan session.
+$storagePath = '/tmp/storage';
+
+if (!is_dir($storagePath)) {
+    mkdir($storagePath, 0777, true);
 }
 
-// 2. Cek File Bootstrap Laravel
-echo "<h3>2. Cek File Public & Bootstrap</h3>";
-$publicPath = __DIR__ . '/../public/index.php';
-if (file_exists($publicPath)) {
-    echo "✅ Public index ditemukan.<br>";
-} else {
-    echo "❌ Public index hilang.<br>";
-}
+// Redirect path storage ke /tmp
+$app->useStoragePath($storagePath);
+// -------------------------------------------
 
-// 3. Intip Isi Folder Utama
-echo "<h3>3. Daftar File di Folder Backend</h3>";
-echo "<pre>";
-// Menampilkan semua file di folder Backend (satu tingkat di atas folder api)
-print_r(scandir(__DIR__ . '/../'));
-echo "</pre>";
+// 3. Jalankan Kernel (Standar Laravel)
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 
-echo "<h3>4. Cek Versi PHP</h3>";
-echo "PHP Version: " . phpversion();
-?>
+$response = $kernel->handle(
+    $request = Illuminate\Http\Request::capture()
+);
+
+$response->send();
+
+$kernel->terminate($request, $response);
