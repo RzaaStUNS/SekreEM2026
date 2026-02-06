@@ -9,6 +9,7 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // Route yang butuh token (Baru pakai auth:sanctum)
 Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('prokers', ProkerController::class);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', function (Request $request) {
         return $request->user();
