@@ -79,10 +79,15 @@ const API_URL = `${API_BASE_URL}/prokers`; // Pastikan route backendmu namanya '
   });
 
   // === FETCH DATA DARI BACKEND ===
-  const fetchProkers = async () => {
+  // GANTI FUNCTION fetchProkers DENGAN INI
+const fetchProkers = async () => {
     try {
-      const response = await axios.get(API_URL);
-      // Format data agar string date jadi Object Date JS
+      const token = localStorage.getItem("auth_token"); // <--- AMBIL TOKEN
+      
+      const response = await axios.get(API_URL, {
+        headers: { Authorization: `Bearer ${token}` } // <--- LAMPIRKAN TIKET
+      });
+
       const formattedData = response.data.map((p: any) => ({
         ...p,
         startDate: new Date(p.startDate),
@@ -92,7 +97,7 @@ const API_URL = `${API_BASE_URL}/prokers`; // Pastikan route backendmu namanya '
     } catch (error) {
       console.error("Gagal mengambil data proker:", error);
     }
-  };
+};
 
   // === 1. DETEKSI USER & LOAD DATA ===
   useEffect(() => {
@@ -198,32 +203,47 @@ const API_URL = `${API_BASE_URL}/prokers`; // Pastikan route backendmu namanya '
     setIsFormOpen(true);
   };
 
-  const handleSave = async () => {
+ const handleSave = async () => {
+    // ... (Validasi divisi tetap sama) ...
     if (editingProker && !isAdmin && editingProker.division !== userDivision) {
         alert("Akses Ditolak: Anda tidak bisa mengedit proker divisi lain.");
         return;
     }
     const finalDivision = isAdmin ? formData.division : userDivision;
+    
+    // Payload data
     const payload = {
         ...formData,
         division: finalDivision,
-        id: editingProker ? editingProker.id : Date.now().toString()
+        // Hapus ID dari payload create biar ga bingung backendnya
     };
 
     try {
+      const token = localStorage.getItem("auth_token"); // <--- AMBIL TOKEN
+      const config = {
+        headers: { 
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+        }
+      };
+
       if (editingProker) {
-        // Laravel route update biasanya tidak standar di API, kita gunakan POST/PUT sesuai route Laravelmu
-        await axios.post(`${API_URL}`, payload); // Sesuai ProkerController@store yang pakai DB::table()->insert()
+        // UPDATE: Gunakan PUT ke /api/prokers/{id}
+        await axios.put(`${API_URL}/${editingProker.id}`, payload, config);
       } else {
-        await axios.post(API_URL, payload);
+        // CREATE: Gunakan POST ke /api/prokers
+        await axios.post(API_URL, payload, config);
       }
-      fetchProkers(); // Refresh data dari DB
+
+      fetchProkers(); // Refresh data
       setIsFormOpen(false);
       resetForm();
-    } catch (err) {
-      alert("Gagal menyimpan ke Database Aiven!");
+      alert("Berhasil menyimpan proker! 🎉"); // Kasih notif sukses
+    } catch (err: any) {
+      console.error(err);
+      alert("Gagal menyimpan: " + (err.response?.data?.message || "Cek koneksi internet"));
     }
-  };
+};
 
   const handleDelete = async () => {
     if (editingProker) {
