@@ -245,22 +245,24 @@ const fetchProkers = async () => {
     }
 };
 
-  const handleDelete = async () => {
+ const handleDelete = async () => {
     if (editingProker) {
-       if (!isAdmin && editingProker.division !== userDivision) {
-         alert("Akses Ditolak: Anda tidak bisa menghapus proker divisi lain.");
-         return;
-       }
+       // ... (Validasi tetap sama) ...
+       
        try {
-         await axios.delete(`${API_URL}/${editingProker.id}`);
+         const token = localStorage.getItem("auth_token"); // <--- AMBIL TOKEN
+         await axios.delete(`${API_URL}/${editingProker.id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+         });
+         
          fetchProkers();
          setIsFormOpen(false);
          resetForm();
        } catch (err) {
-         alert("Gagal menghapus data di database.");
+         alert("Gagal menghapus data.");
        }
     }
-  };
+};
 
   const resetForm = () => {
     setFormData({ name: "", division: "", startDate: "", endDate: "", time: "", description: "", link: "" });
