@@ -52,7 +52,8 @@ const monthNames = [
 export default function Calendar() {
   // === CONFIG API ===
   // Ganti link di bawah ini dengan link backend Vercel kamu yang baru saja Ready
-  const API_URL = "https://sekreem2026-production.up.railway.app"; 
+  const API_BASE_URL = "https://sekreem2026-production.up.railway.app/api"; 
+const API_URL = `${API_BASE_URL}/prokers`; // Pastikan route backendmu namanya 'prokers'
 
   const [currentDate, setCurrentDate] = useState(new Date(2026, 0, 1));
   const [selectedDivisions, setSelectedDivisions] = useState<string[]>(divisions.map(d => d.value));
