@@ -6,7 +6,8 @@ import {
   FileDown, 
   PenTool, 
   ArrowRight,
-  Presentation 
+  Presentation,
+  ExternalLink // Saya tambah icon ini buat penanda link keluar
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -109,21 +110,31 @@ export default function KenalAdministrasi() {
             </Link>
           ))}
 
-          {/* Card Tambahan: Link PPT Asli (Opsional, kalau masih mau simpan file aslinya) */}
-          <div className="rounded-[2rem] bg-gradient-to-br from-gray-800 to-gray-900 text-white p-6 flex flex-col justify-between shadow-soft">
+          {/* === Card Spesial: Link Canva === */}
+          <div className="rounded-[2rem] bg-gradient-to-br from-[#5b21b6] to-[#4c1d95] text-white p-6 flex flex-col justify-between shadow-soft relative overflow-hidden group">
+            {/* Dekorasi Background ala Canva */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 animate-pulse"></div>
+            
             <div>
-                <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-4 text-white">
+                <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-4 text-white backdrop-blur-sm shadow-inner border border-white/10">
                     <Presentation size={32} />
                 </div>
                 <h3 className="text-lg font-bold mb-2">Materi Presentasi</h3>
-                <p className="text-sm text-gray-300 mb-6">
-                    Unduh file PPT asli materi Kenal Administrasi 2025.
+                <p className="text-sm text-gray-200/90 mb-6">
+                    Akses slide "Kenal Administrasi" versi interaktif langsung di Canva.
                 </p>
             </div>
-            <button className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition-all font-semibold flex items-center justify-center gap-2">
-                Download PPT <FileDown size={18} />
-            </button>
+            
+            <a 
+                href="https://www.canva.com/design/DAGd0CetuYQ/T2RAFJYpDD4mWIterH_dFw/view" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-full py-3.5 rounded-xl bg-white text-[#4c1d95] hover:bg-gray-100 transition-all font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95"
+            >
+                Buka Slide Canva <ExternalLink size={18} />
+            </a>
           </div>
+
         </div>
 
       </div>
