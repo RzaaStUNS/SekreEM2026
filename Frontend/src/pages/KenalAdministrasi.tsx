@@ -7,7 +7,7 @@ import {
   PenTool, 
   ArrowRight,
   Presentation,
-  ExternalLink // Saya tambah icon ini buat penanda link keluar
+  ExternalLink 
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
