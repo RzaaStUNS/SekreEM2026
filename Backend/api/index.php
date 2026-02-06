@@ -1,30 +1,37 @@
 <?php
 
-// --- 1. CONFIGURATION ---
+// --- 1. FORCE JSON (OBAT AMPUH) ---
+// Paksa Laravel menganggap ini request API. 
+// Jadi kalau error, dia gak bakal cari class 'View', tapi langsung return JSON.
+$_SERVER['HTTP_ACCEPT'] = 'application/json';
+
+// --- 2. CONFIGURATION ---
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-// --- 2. CACHE NUKE (PENTING!) ---
-// Hapus cache bawaan build yang sering bikin error path mismatch di Vercel
+// --- 3. CACHE NUKE (PEMBERSIH CACHE) ---
+// Hapus config cache yang sering bikin path error di Vercel
 $cacheDir = __DIR__ . '/../bootstrap/cache';
-$files = glob($cacheDir . '/*.php');
-if ($files) {
-    foreach ($files as $file) {
-        if (basename($file) !== '.gitignore') {
-            @unlink($file); // Hapus config.php, packages.php, services.php
+if (is_dir($cacheDir)) {
+    $files = glob($cacheDir . '/*.php');
+    if ($files) {
+        foreach ($files as $file) {
+            if (basename($file) !== '.gitignore') {
+                @unlink($file);
+            }
         }
     }
 }
 
-// --- 3. AUTOLOAD ---
+// --- 4. AUTOLOAD ---
 require __DIR__ . '/../vendor/autoload.php';
 
 try {
-    // --- 4. BOOTSTRAP ---
+    // --- 5. BOOTSTRAP ---
     $app = require_once __DIR__ . '/../bootstrap/app.php';
 
-    // --- 5. FIX STORAGE PATH (VERCEL READ-ONLY) ---
+    // --- 6. FIX STORAGE PATH (VERCEL READ-ONLY) ---
     $storage = '/tmp/storage';
     if (!is_dir($storage)) {
         mkdir($storage, 0777, true);
@@ -33,7 +40,7 @@ try {
     // Bind path baru
     $app->useStoragePath($storage);
     
-    // Buat folder struktur storage yang dibutuhkan Laravel
+    // Buat folder struktur storage
     $subdirs = [
         'framework/views', 
         'framework/cache/data', 
@@ -45,7 +52,7 @@ try {
         if (!is_dir("$storage/$dir")) mkdir("$storage/$dir", 0777, true);
     }
 
-    // --- 6. RUN APP ---
+    // --- 7. RUN APP ---
     $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
     $response = $kernel->handle(
         $request = Illuminate\Http\Request::capture()
@@ -54,12 +61,14 @@ try {
     $kernel->terminate($request, $response);
 
 } catch (\Throwable $e) {
-    // Error Handler Darurat
+    // Error Handler Terakhir (JSON Format)
     http_response_code(500);
-    echo "<div style='font-family:monospace; background:#fff0f0; color:#d00; padding:20px; border:1px solid #d00;'>";
-    echo "<h1>💥 Error Tertangkap!</h1>";
-    echo "<h3>" . $e->getMessage() . "</h3>";
-    echo "<p><strong>File:</strong> " . $e->getFile() . " (Line " . $e->getLine() . ")</p>";
-    echo "<pre style='background:#fff; padding:10px; border:1px solid #ccc; overflow:auto;'>" . $e->getTraceAsString() . "</pre>";
-    echo "</div>";
+    header('Content-Type: application/json');
+    echo json_encode([
+        "message" => "Critical Error",
+        "error" => $e->getMessage(),
+        "file" => $e->getFile(),
+        "line" => $e->getLine(),
+        "trace" => explode("\n", $e->getTraceAsString()) // Potong trace biar rapi
+    ]);
 }
