@@ -1,55 +1,65 @@
 <?php
 
-// Konfigurasi Error Reporting Tingkat Dewa
+// --- 1. CONFIGURATION ---
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-// 1. Panggil Autoload
+// --- 2. CACHE NUKE (PENTING!) ---
+// Hapus cache bawaan build yang sering bikin error path mismatch di Vercel
+$cacheDir = __DIR__ . '/../bootstrap/cache';
+$files = glob($cacheDir . '/*.php');
+if ($files) {
+    foreach ($files as $file) {
+        if (basename($file) !== '.gitignore') {
+            @unlink($file); // Hapus config.php, packages.php, services.php
+        }
+    }
+}
+
+// --- 3. AUTOLOAD ---
 require __DIR__ . '/../vendor/autoload.php';
 
 try {
-    // 2. Bootstrapping Laravel
+    // --- 4. BOOTSTRAP ---
     $app = require_once __DIR__ . '/../bootstrap/app.php';
 
-    // --- FIX VERCEL STORAGE (PENTING) ---
-    // Alihkan semua penulisan file ke folder sementara (/tmp)
+    // --- 5. FIX STORAGE PATH (VERCEL READ-ONLY) ---
     $storage = '/tmp/storage';
     if (!is_dir($storage)) {
         mkdir($storage, 0777, true);
     }
     
-    // Bind path storage baru ke aplikasi
+    // Bind path baru
     $app->useStoragePath($storage);
     
-    // Trik tambahan: Buat folder spesifik agar view/cache tidak error
-    $dirs = ['framework/views', 'framework/cache', 'framework/sessions', 'logs'];
-    foreach ($dirs as $dir) {
+    // Buat folder struktur storage yang dibutuhkan Laravel
+    $subdirs = [
+        'framework/views', 
+        'framework/cache/data', 
+        'framework/sessions', 
+        'logs', 
+        'app/public'
+    ];
+    foreach ($subdirs as $dir) {
         if (!is_dir("$storage/$dir")) mkdir("$storage/$dir", 0777, true);
     }
-    // -------------------------------------
 
-    // 3. Jalankan Aplikasi
+    // --- 6. RUN APP ---
     $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
-
     $response = $kernel->handle(
         $request = Illuminate\Http\Request::capture()
     );
-
     $response->send();
     $kernel->terminate($request, $response);
 
 } catch (\Throwable $e) {
-    // 4. TANGKAP ERROR FATAL (Jaring Pengaman)
-    // Jika Laravel crash, kode ini yang akan jalan
+    // Error Handler Darurat
     http_response_code(500);
-    echo "<div style='background: #fee; color: #b00; padding: 20px; font-family: monospace;'>";
-    echo "<h1>🔥 FATAL ERROR TERTANGKAP</h1>";
-    echo "<h3>Pesan Error:</h3>";
-    echo "<pre style='font-size: 1.2em;'>" . $e->getMessage() . "</pre>";
-    echo "<h3>Lokasi File:</h3>";
-    echo "<pre>" . $e->getFile() . " di baris " . $e->getLine() . "</pre>";
-    echo "<h3>Stack Trace:</h3>";
-    echo "<pre>" . $e->getTraceAsString() . "</pre>";
+    echo "<div style='font-family:monospace; background:#fff0f0; color:#d00; padding:20px; border:1px solid #d00;'>";
+    echo "<h1>💥 Error Tertangkap!</h1>";
+    echo "<h3>" . $e->getMessage() . "</h3>";
+    echo "<p><strong>File:</strong> " . $e->getFile() . " (Line " . $e->getLine() . ")</p>";
+    echo "<pre style='background:#fff; padding:10px; border:1px solid #ccc; overflow:auto;'>" . $e->getTraceAsString() . "</pre>";
     echo "</div>";
 }
