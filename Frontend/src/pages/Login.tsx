@@ -14,7 +14,7 @@ import thinkingImg from "@/assets/mascot/thinking.png";
 export default function Login() {
   // --- KONFIGURASI API BARU (TOKEN BASED) ---
   const api = axios.create({
-    baseURL: "http://127.0.0.1:8000",
+    baseURL: "https://sekreem2026-production.up.railway.app/",
     // withCredentials: true,  <-- INI KITA HAPUS BIAR GA CONFLICT CSRF
     headers: {
       "Content-Type": "application/json",
