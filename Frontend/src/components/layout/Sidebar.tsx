@@ -58,7 +58,7 @@ const menuItems: MenuItem[] = [
   },
   {
     icon: <Calendar size={20} />,
-    label: "Kalender Proker",
+    label: "Kalender Proker Emailkomp",
     path: "/calendar",
   },
   {
