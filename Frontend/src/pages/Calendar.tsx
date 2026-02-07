@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Clock, Link2, Trash2, Lock, AlertCircle, Eye, Edit3, HelpCircle, MousePointer2, Filter, ShieldCheck } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Clock, Link2, Trash2, Lock, AlertCircle, Eye, Edit3, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import axios from "axios"; // Tambahkan Import Axios
+import axios from "axios"; 
 
 // === TIPE DATA ===
 interface Proker {
@@ -21,26 +21,27 @@ interface Proker {
   link?: string;
 }
 
-// === KONFIGURASI DIVISI ===
+// === KONFIGURASI DIVISI (LENGKAP) ===
 const divisions = [
-  { value: "wakahim", label: "Wakahim", color: "bg-wakahim" },
-  { value: "sekretaris", label: "Sekretaris", color: "bg-sekretaris" },
-  { value: "bendahara", label: "Bendahara", color: "bg-bendahara" },
-  { value: "personalia", label: "Personalia", color: "bg-personalia" },
-  { value: "ekraf", label: "EKRAF", color: "bg-ekraf" },
-  { value: "psdm", label: "PSDM", color: "bg-psdm" },
-  { value: "mikat", label: "MIKAT", color: "bg-mikat" },
-  { value: "sosma", label: "SOSMA", color: "bg-sosma" },
-  { value: "rnd", label: "RND", color: "bg-rnd" },
-  { value: "medinfo", label: "MEDINFO", color: "bg-medinfo" },
+  { value: "wakahim", label: "Wakil Ketua Umum", color: "bg-purple-500" },
+  { value: "sekretaris", label: "Sekretaris Umum", color: "bg-pink-500" },
+  { value: "bendahara", label: "Bendahara Umum", color: "bg-yellow-500" },
+  { value: "personalia", label: "Biro Personalia", color: "bg-blue-500" },
+  { value: "ekraf", label: "Ekonomi Kreatif", color: "bg-green-500" },
+  { value: "psdm", label: "PSDM", color: "bg-orange-500" },
+  { value: "mikat", label: "Minat & Bakat", color: "bg-red-500" },
+  { value: "humas", label: "Hubungan Masyarakat", color: "bg-teal-500" },
+  { value: "sosma", label: "Sosial Masyarakat", color: "bg-indigo-500" },
+  { value: "medinfo", label: "Media & Informasi", color: "bg-cyan-500" },
+  { value: "rnd", label: "Riset & Data", color: "bg-gray-500" },
 ];
 
 const getDivisionColor = (division: string) => {
-  return divisions.find(d => d.value === division)?.color || "bg-gray-300";
+  return divisions.find(d => d.value === division)?.color || "bg-gray-400";
 };
 
 const getDivisionLabel = (division: string) => {
-    return divisions.find(d => d.value === division)?.label || "Unknown";
+    return divisions.find(d => d.value === division)?.label || "Lainnya";
 };
 
 const daysOfWeek = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
@@ -51,9 +52,9 @@ const monthNames = [
 
 export default function Calendar() {
   // === CONFIG API ===
-  // Ganti link di bawah ini dengan link backend Vercel kamu yang baru saja Ready
+  // Pastikan URL ini sesuai dengan Railway kamu
   const API_BASE_URL = "https://sekreem2026-production.up.railway.app/api"; 
-const API_URL = `${API_BASE_URL}/prokers`; // Pastikan route backendmu namanya 'prokers'
+  const API_URL = `${API_BASE_URL}/prokers`; 
 
   const [currentDate, setCurrentDate] = useState(new Date(2026, 0, 1));
   const [selectedDivisions, setSelectedDivisions] = useState<string[]>(divisions.map(d => d.value));
@@ -71,21 +72,20 @@ const API_URL = `${API_BASE_URL}/prokers`; // Pastikan route backendmu namanya '
   const [userDivision, setUserDivision] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // === DATA PROKER (Ambil dari DB) ===
+  // === DATA PROKER ===
   const [prokers, setProkers] = useState<Proker[]>([]);
 
   const [formData, setFormData] = useState({
     name: "", division: "", startDate: "", endDate: "", time: "", description: "", link: "",
   });
 
-  // === FETCH DATA DARI BACKEND ===
-  // GANTI FUNCTION fetchProkers DENGAN INI
-const fetchProkers = async () => {
+  // === FETCH DATA ===
+  const fetchProkers = async () => {
     try {
-      const token = localStorage.getItem("auth_token"); // <--- AMBIL TOKEN
+      const token = localStorage.getItem("auth_token");
       
       const response = await axios.get(API_URL, {
-        headers: { Authorization: `Bearer ${token}` } // <--- LAMPIRKAN TIKET
+        headers: { Authorization: `Bearer ${token}` }
       });
 
       const formattedData = response.data.map((p: any) => ({
@@ -97,11 +97,11 @@ const fetchProkers = async () => {
     } catch (error) {
       console.error("Gagal mengambil data proker:", error);
     }
-};
+  };
 
-  // === 1. DETEKSI USER & LOAD DATA ===
+  // === 1. DETEKSI USER & LOAD DATA (LOGIKA BARU) ===
   useEffect(() => {
-    fetchProkers(); // Load data saat pertama kali buka
+    fetchProkers(); 
 
     const storedUser = localStorage.getItem("user_data");
     if (storedUser) {
@@ -109,16 +109,27 @@ const fetchProkers = async () => {
         const user = JSON.parse(storedUser);
         const email = (user.email || "").toLowerCase();
 
+        // 👑 LOGIKA STRICT: Hanya KETUM yang jadi Admin
+        // Waketum, Sekum, dll dianggap USER BIASA yang punya divisi sendiri
         if (email.includes("ketum") && !email.includes("waketum")) {
           setIsAdmin(true);
           setUserDivision("all"); 
         } else {
           setIsAdmin(false);
+          
+          // MAPPING DIVISI USER
           if (email.includes("waketum")) setUserDivision("wakahim");
           else if (email.includes("sekum")) setUserDivision("sekretaris");
           else if (email.includes("bendum")) setUserDivision("bendahara");
+          else if (email.includes("personalia")) setUserDivision("personalia");
+          else if (email.includes("ekraf")) setUserDivision("ekraf");
+          else if (email.includes("psdm")) setUserDivision("psdm");
+          else if (email.includes("mikat")) setUserDivision("mikat");
+          else if (email.includes("humas")) setUserDivision("humas");
+          else if (email.includes("sosma")) setUserDivision("sosma");
           else if (email.includes("medinfo")) setUserDivision("medinfo");
-          // ... mapping lainnya tetap sama
+          else if (email.includes("rnd")) setUserDivision("rnd");
+          else setUserDivision("unknown");
         }
       } catch (e) {
         console.error("Error parsing user data", e);
@@ -177,7 +188,7 @@ const fetchProkers = async () => {
     setEditingProker(null);
     setFormData({
         name: "",
-        division: isAdmin ? "" : userDivision,
+        division: isAdmin ? "" : userDivision, // Kalau bukan admin, lgsg kunci divisi
         startDate: dateString,
         endDate: dateString,
         time: "",
@@ -204,22 +215,28 @@ const fetchProkers = async () => {
   };
 
  const handleSave = async () => {
-    // ... (Validasi divisi tetap sama) ...
+    // Validasi Divisi
+    if (!formData.division) {
+        alert("Divisi harus diisi!");
+        return;
+    }
+
+    // Cek Hak Akses Edit
     if (editingProker && !isAdmin && editingProker.division !== userDivision) {
         alert("Akses Ditolak: Anda tidak bisa mengedit proker divisi lain.");
         return;
     }
+
+    // Paksa Divisi User jika bukan Admin
     const finalDivision = isAdmin ? formData.division : userDivision;
     
-    // Payload data
     const payload = {
         ...formData,
         division: finalDivision,
-        // Hapus ID dari payload create biar ga bingung backendnya
     };
 
     try {
-      const token = localStorage.getItem("auth_token"); // <--- AMBIL TOKEN
+      const token = localStorage.getItem("auth_token");
       const config = {
         headers: { 
             Authorization: `Bearer ${token}`,
@@ -228,17 +245,15 @@ const fetchProkers = async () => {
       };
 
       if (editingProker) {
-        // UPDATE: Gunakan PUT ke /api/prokers/{id}
         await axios.put(`${API_URL}/${editingProker.id}`, payload, config);
       } else {
-        // CREATE: Gunakan POST ke /api/prokers
         await axios.post(API_URL, payload, config);
       }
 
-      fetchProkers(); // Refresh data
+      fetchProkers(); 
       setIsFormOpen(false);
       resetForm();
-      alert("Berhasil menyimpan proker! 🎉"); // Kasih notif sukses
+      alert("Berhasil menyimpan proker! 🎉");
     } catch (err: any) {
       console.error(err);
       alert("Gagal menyimpan: " + (err.response?.data?.message || "Cek koneksi internet"));
@@ -247,10 +262,8 @@ const fetchProkers = async () => {
 
  const handleDelete = async () => {
     if (editingProker) {
-       // ... (Validasi tetap sama) ...
-       
        try {
-         const token = localStorage.getItem("auth_token"); // <--- AMBIL TOKEN
+         const token = localStorage.getItem("auth_token");
          await axios.delete(`${API_URL}/${editingProker.id}`, {
             headers: { Authorization: `Bearer ${token}` }
          });
@@ -362,7 +375,7 @@ const fetchProkers = async () => {
                           {dayProkers.length > 3 && <div className="text-[10px] font-bold text-muted-foreground text-center bg-muted/50 rounded-md py-0.5">+{dayProkers.length - 3} lainnya</div>}
                         </div>
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/5 rounded-2xl">
-                             <Plus className="text-pink-pastel drop-shadow-md" size={32} />
+                              <Plus className="text-pink-pastel drop-shadow-md" size={32} />
                         </div>
                       </>
                     )}
@@ -374,7 +387,7 @@ const fetchProkers = async () => {
         </div>
       </div>
 
-      {/* DIALOGS (Modal List, Form, Guide) tetap di bawah seperti kode aslimu */}
+      {/* DIALOGS */}
       <Dialog open={isListOpen} onOpenChange={setIsListOpen}>
         <DialogContent className="sm:max-w-md rounded-3xl border-0 shadow-2xl bg-white/95 backdrop-blur-xl">
           <DialogHeader>
@@ -423,7 +436,16 @@ const fetchProkers = async () => {
             {!canEdit && <div className="bg-amber-50 text-amber-700 px-4 py-3 rounded-xl border border-amber-100 flex items-start gap-3"><AlertCircle className="shrink-0 mt-0.5" size={18} /><div className="text-sm"><strong>Mode Baca Saja</strong><p className="opacity-90 text-xs mt-0.5">Anda hanya dapat melihat proker dari divisi lain.</p></div></div>}
             <div className="grid gap-4">
               <div><label className="text-sm font-bold text-foreground/80 mb-1.5 block">Nama Program Kerja</label><Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="h-12 bg-muted/20 border-border/50 rounded-xl" disabled={!canEdit} /></div>
-              <div><label className="text-sm font-bold text-foreground/80 mb-1.5 block">Divisi Penanggung Jawab</label><Select value={formData.division} onValueChange={(value) => setFormData({ ...formData, division: value })} disabled={(!isAdmin && !editingProker) || !canEdit}><SelectTrigger className="h-12 bg-muted/20 border-border/50 rounded-xl"><SelectValue placeholder="Pilih divisi..." /></SelectTrigger><SelectContent className="rounded-xl border-border/50 shadow-xl">{divisions.map(div => (<SelectItem key={div.value} value={div.value} className="rounded-lg my-0.5 cursor-pointer"><div className="flex items-center gap-2"><div className={cn("w-3 h-3 rounded-full shadow-sm", div.color)} />{div.label}</div></SelectItem>))}</SelectContent></Select>{!isAdmin && !editingProker && <p className="text-[10px] text-muted-foreground mt-1.5 ml-1 flex items-center gap-1"><Lock size={10} /> Otomatis terpilih sesuai Divisi Anda.</p>}</div>
+              <div>
+                <label className="text-sm font-bold text-foreground/80 mb-1.5 block">Divisi Penanggung Jawab</label>
+                <Select value={formData.division} onValueChange={(value) => setFormData({ ...formData, division: value })} disabled={(!isAdmin && !editingProker) || !canEdit}>
+                    <SelectTrigger className="h-12 bg-muted/20 border-border/50 rounded-xl"><SelectValue placeholder="Pilih divisi..." /></SelectTrigger>
+                    <SelectContent className="rounded-xl border-border/50 shadow-xl">
+                        {divisions.map(div => (<SelectItem key={div.value} value={div.value} className="rounded-lg my-0.5 cursor-pointer"><div className="flex items-center gap-2"><div className={cn("w-3 h-3 rounded-full shadow-sm", div.color)} />{div.label}</div></SelectItem>))}
+                    </SelectContent>
+                </Select>
+                {!isAdmin && <p className="text-[10px] text-muted-foreground mt-1.5 ml-1 flex items-center gap-1"><Lock size={10} /> Otomatis terpilih sesuai Divisi Anda.</p>}
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div><label className="text-sm font-bold text-foreground/80 mb-1.5 flex items-center gap-2"><CalendarIcon size={14} className="text-pink-pastel" /> Mulai</label><Input type="date" value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} className="h-12 bg-muted/20 border-border/50 rounded-xl" disabled={!canEdit} /></div>
                 <div><label className="text-sm font-bold text-foreground/80 mb-1.5 flex items-center gap-2"><CalendarIcon size={14} className="text-pink-pastel" /> Selesai</label><Input type="date" value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} className="h-12 bg-muted/20 border-border/50 rounded-xl" disabled={!canEdit} /></div>
@@ -443,9 +465,26 @@ const fetchProkers = async () => {
         </DialogContent>
       </Dialog>
       
-      {/* GUIDE DIALOG (tetap sama) */}
+      {/* GUIDE DIALOG */}
       <Dialog open={isGuideOpen} onOpenChange={setIsGuideOpen}>
-         {/* ... isi dialog guide kamu tetap sama ... */}
+         <DialogContent className="sm:max-w-md rounded-3xl border-0 shadow-2xl bg-white/95 backdrop-blur-xl p-0 overflow-hidden">
+            <div className="bg-gradient-to-br from-pink-pastel to-purple-400 p-6 text-white text-center">
+                <CalendarIcon size={48} className="mx-auto mb-3 opacity-90" />
+                <h2 className="text-2xl font-bold">Selamat Datang di Kalender!</h2>
+                <p className="opacity-90 mt-1">Kelola proker BEM dengan mudah dan estetik ✨</p>
+            </div>
+            <div className="p-6 space-y-4">
+                <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-baby-blue/20 text-baby-blue flex items-center justify-center font-bold shrink-0">1</div>
+                    <div><h4 className="font-bold text-foreground">Lihat Jadwal</h4><p className="text-sm text-muted-foreground">Klik tanggal untuk melihat daftar proker di hari itu.</p></div>
+                </div>
+                <div className="flex items-start gap-3">
+                     <div className="w-8 h-8 rounded-full bg-pink-pastel/20 text-pink-pastel flex items-center justify-center font-bold shrink-0">2</div>
+                     <div><h4 className="font-bold text-foreground">Tambah Proker</h4><p className="text-sm text-muted-foreground">Pilih tanggal, lalu klik tombol tambah. Divisi akan terisi otomatis sesuai akunmu.</p></div>
+                </div>
+                <Button onClick={() => setIsGuideOpen(false)} className="w-full bg-foreground text-white rounded-xl mt-2">Mengerti, Gass!</Button>
+            </div>
+         </DialogContent>
       </Dialog>
     </MainLayout>
   );
