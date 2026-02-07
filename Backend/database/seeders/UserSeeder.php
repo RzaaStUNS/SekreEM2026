@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Daftar user, email, dan password sesuai request terbaru
+        // Daftar user lengkap sesuai request
         $users = [
             [
                 'name' => 'Ketua Umum',
@@ -56,7 +56,7 @@ class UserSeeder extends Seeder
                 'password' => 'mikat_emailkompuns2026'
             ],
             [
-                'name' => 'Hubungan Masyarakat',
+                'name' => 'Hubungan Masyarakat', // Note: Nama di array kamu tadi 'Hubungan Masyarakat', pastikan konsisten
                 'email' => 'humas@em.uns.ac.id',
                 'password' => 'humas_emailkompuns2026'
             ],
@@ -77,13 +77,15 @@ class UserSeeder extends Seeder
             ],
         ];
 
-        // Looping insert data
+        // Looping insert data dengan aman
         foreach ($users as $user) { 
-            User::create([
-                'name' => $user['name'],
-                'email' => $user['email'],
-                'password' => Hash::make($user['password']), // Password di-hash
-            ]);
+            User::firstOrCreate(
+                ['email' => $user['email']], // Cek: Jika email ini ada, jangan error
+                [
+                    'name' => $user['name'],
+                    'password' => Hash::make($user['password']), // Buat baru jika belum ada
+                ]
+            );
         }
     }
 }
