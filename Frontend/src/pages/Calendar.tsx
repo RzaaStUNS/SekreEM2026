@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Clock, Link2, Trash2, Lock, AlertCircle, Eye, Edit3, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import axios from "axios"; 
+import axios from "axios";
 
 // === TIPE DATA ===
 interface Proker {
@@ -21,7 +21,7 @@ interface Proker {
   link?: string;
 }
 
-// === KONFIGURASI DIVISI (LENGKAP) ===
+// === KONFIGURASI DIVISI ===
 const divisions = [
   { value: "wakahim", label: "Wakil Ketua Umum", color: "bg-purple-500" },
   { value: "sekretaris", label: "Sekretaris Umum", color: "bg-pink-500" },
@@ -50,9 +50,16 @@ const monthNames = [
   "Juli", "Agustus", "September", "Oktober", "November", "Desember"
 ];
 
+// === 🛠️ HELPER FIX TIMEZONE (Agar tanggal tidak mundur) ===
+const formatDateLocal = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export default function Calendar() {
   // === CONFIG API ===
-  // Pastikan URL ini sesuai dengan Railway kamu
   const API_BASE_URL = "https://sekreem2026-production.up.railway.app/api"; 
   const API_URL = `${API_BASE_URL}/prokers`; 
 
@@ -83,7 +90,6 @@ export default function Calendar() {
   const fetchProkers = async () => {
     try {
       const token = localStorage.getItem("auth_token");
-      
       const response = await axios.get(API_URL, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -99,7 +105,7 @@ export default function Calendar() {
     }
   };
 
-  // === 1. DETEKSI USER & LOAD DATA (LOGIKA BARU) ===
+  // === 1. DETEKSI USER & LOAD DATA ===
   useEffect(() => {
     fetchProkers(); 
 
@@ -109,15 +115,13 @@ export default function Calendar() {
         const user = JSON.parse(storedUser);
         const email = (user.email || "").toLowerCase();
 
-        // 👑 LOGIKA STRICT: Hanya KETUM yang jadi Admin
-        // Waketum, Sekum, dll dianggap USER BIASA yang punya divisi sendiri
+        // Admin: Ketum & Waketum
         if (email.includes("ketum") && !email.includes("waketum")) {
           setIsAdmin(true);
           setUserDivision("all"); 
         } else {
           setIsAdmin(false);
-          
-          // MAPPING DIVISI USER
+          // Mapping Divisi
           if (email.includes("waketum")) setUserDivision("wakahim");
           else if (email.includes("sekum")) setUserDivision("sekretaris");
           else if (email.includes("bendum")) setUserDivision("bendahara");
@@ -158,6 +162,22 @@ export default function Calendar() {
     return days;
   };
 
+  // === GENERATOR LIST BULAN (SIDEBAR) ===
+  const generateMonthList = () => {
+    const months = [];
+    const start = new Date(2026, 0, 1); // Januari 2026
+    const end = new Date(2027, 1, 1);   // Februari 2027
+    
+    const current = new Date(start);
+    while (current <= end) {
+      months.push(new Date(current));
+      current.setMonth(current.getMonth() + 1);
+    }
+    return months;
+  };
+  
+  const monthNavigationList = generateMonthList();
+
   const getProkerForDate = (day: number) => {
     const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
     return prokers.filter(p => {
@@ -184,11 +204,13 @@ export default function Calendar() {
   };
 
   const openCreateForm = (date: Date) => {
-    const dateString = date.toISOString().split("T")[0];
+    // 🛠️ FIX: Gunakan formatDateLocal
+    const dateString = formatDateLocal(date); 
+
     setEditingProker(null);
     setFormData({
         name: "",
-        division: isAdmin ? "" : userDivision, // Kalau bukan admin, lgsg kunci divisi
+        division: isAdmin ? "" : userDivision,
         startDate: dateString,
         endDate: dateString,
         time: "",
@@ -204,8 +226,9 @@ export default function Calendar() {
     setFormData({
         name: proker.name,
         division: proker.division,
-        startDate: proker.startDate.toISOString().split("T")[0],
-        endDate: proker.endDate.toISOString().split("T")[0],
+        // 🛠️ FIX: Gunakan formatDateLocal saat edit
+        startDate: formatDateLocal(proker.startDate),
+        endDate: formatDateLocal(proker.endDate),
         time: proker.time || "",
         description: proker.description || "",
         link: proker.link || "",
@@ -215,19 +238,14 @@ export default function Calendar() {
   };
 
  const handleSave = async () => {
-    // Validasi Divisi
     if (!formData.division) {
         alert("Divisi harus diisi!");
         return;
     }
-
-    // Cek Hak Akses Edit
     if (editingProker && !isAdmin && editingProker.division !== userDivision) {
         alert("Akses Ditolak: Anda tidak bisa mengedit proker divisi lain.");
         return;
     }
-
-    // Paksa Divisi User jika bukan Admin
     const finalDivision = isAdmin ? formData.division : userDivision;
     
     const payload = {
@@ -258,9 +276,9 @@ export default function Calendar() {
       console.error(err);
       alert("Gagal menyimpan: " + (err.response?.data?.message || "Cek koneksi internet"));
     }
-};
+  };
 
- const handleDelete = async () => {
+  const handleDelete = async () => {
     if (editingProker) {
        try {
          const token = localStorage.getItem("auth_token");
@@ -275,7 +293,7 @@ export default function Calendar() {
          alert("Gagal menghapus data.");
        }
     }
-};
+  };
 
   const resetForm = () => {
     setFormData({ name: "", division: "", startDate: "", endDate: "", time: "", description: "", link: "" });
@@ -297,45 +315,62 @@ export default function Calendar() {
 
   return (
     <MainLayout>
-      <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-140px)] animate-fade-in">
+      {/* Container Utama tanpa scroll (h-screen di parent MainLayout biasanya sudah ada, tapi kita kunci di sini) */}
+      <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-100px)] overflow-hidden animate-fade-in pr-2 pb-2">
         
-        {/* SIDEBAR */}
-        <div className="w-full lg:w-64 flex-shrink-0 space-y-6">
-          <div className="card-pastel p-4">
-            <h3 className="font-bold text-foreground mb-3 text-center lg:text-left">
-              {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+        {/* === SIDEBAR (FIXED HEIGHT, SCROLLABLE INSIDE) === */}
+        <div className="w-full lg:w-64 flex-shrink-0 space-y-4 flex flex-col h-full">
+          
+          {/* Card List Bulan (Scrollable) */}
+          <div className="card-pastel p-4 flex flex-col h-1/2 min-h-[200px]">
+             <h3 className="font-bold text-foreground mb-3 text-center lg:text-left flex items-center gap-2 shrink-0">
+              <CalendarIcon size={18} className="text-pink-pastel"/> 
+              Pilih Bulan
             </h3>
-            <div className="grid grid-cols-7 gap-1 text-center text-xs">
-              {daysOfWeek.map(day => <div key={day} className="text-muted-foreground font-medium py-1">{day}</div>)}
-              {getDaysInMonth(currentDate).map((day, i) => {
-                const hasProker = day ? getProkerForDate(day).length > 0 : false;
+            
+            <div className="flex-1 overflow-y-auto pr-2 space-y-1 scrollbar-thin scrollbar-thumb-pink-200 hover:scrollbar-thumb-pink-300">
+              {monthNavigationList.map((m, idx) => {
+                const isSelected = m.getMonth() === currentDate.getMonth() && m.getFullYear() === currentDate.getFullYear();
                 return (
-                  <div key={i} className={cn("py-1 rounded-lg text-sm cursor-pointer", day && isToday(day) && "bg-pink-pastel text-white font-bold", day && hasProker && !isToday(day) && "bg-baby-blue/50 font-semibold", day && !isToday(day) && !hasProker && "hover:bg-muted")} onClick={() => day && handleDateClick(day)}>
-                    {day}
-                  </div>
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentDate(new Date(m))}
+                    className={cn(
+                      "w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition-all",
+                      isSelected 
+                        ? "bg-gradient-to-r from-pink-pastel to-purple-400 text-white shadow-md transform scale-[1.02]" 
+                        : "text-muted-foreground hover:bg-white hover:text-foreground hover:shadow-sm"
+                    )}
+                  >
+                    {monthNames[m.getMonth()]} {m.getFullYear()}
+                  </button>
                 );
               })}
             </div>
           </div>
-          <div className="card-pastel p-4">
-            <h3 className="font-bold text-foreground mb-3">Divisi Proker</h3>
-            <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
-              {divisions.map(div => (
-                <label key={div.value} className="flex items-center gap-3 cursor-pointer group p-1 hover:bg-muted/50 rounded-lg">
-                  <input type="checkbox" checked={selectedDivisions.includes(div.value)} onChange={() => toggleDivision(div.value)} className="hidden" />
-                  <div className={cn("w-3 h-3 rounded-full transition-all ring-2 ring-offset-1", div.color, selectedDivisions.includes(div.value) ? "ring-opacity-100 scale-110" : "ring-opacity-0 scale-100 grayscale opacity-50")} />
-                  <span className={cn("text-sm font-medium", selectedDivisions.includes(div.value) ? "text-foreground" : "text-muted-foreground")}>{div.label}</span>
-                </label>
-              ))}
+
+          {/* Filter Divisi (Scrollable) */}
+          <div className="card-pastel p-4 flex flex-col h-1/2 min-h-[200px]">
+            <h3 className="font-bold text-foreground mb-3 text-sm shrink-0">Filter Divisi</h3>
+            <div className="flex-1 overflow-y-auto pr-2">
+                <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
+                {divisions.map(div => (
+                    <label key={div.value} className="flex items-center gap-3 cursor-pointer group p-1 hover:bg-muted/50 rounded-lg">
+                    <input type="checkbox" checked={selectedDivisions.includes(div.value)} onChange={() => toggleDivision(div.value)} className="hidden" />
+                    <div className={cn("w-3 h-3 rounded-full transition-all ring-2 ring-offset-1", div.color, selectedDivisions.includes(div.value) ? "ring-opacity-100 scale-110" : "ring-opacity-0 scale-100 grayscale opacity-50")} />
+                    <span className={cn("text-xs font-medium", selectedDivisions.includes(div.value) ? "text-foreground" : "text-muted-foreground")}>{div.label}</span>
+                    </label>
+                ))}
+                </div>
             </div>
           </div>
         </div>
 
-        {/* MAIN CALENDAR */}
-        <div className="flex-1 card-pastel p-6 overflow-hidden flex flex-col shadow-lg border-white/50">
-          <div className="flex items-center justify-between mb-6 gap-4">
+        {/* MAIN CALENDAR (AUTO RESIZE) */}
+        <div className="flex-1 card-pastel p-4 lg:p-6 overflow-hidden flex flex-col shadow-lg border-white/50 h-full">
+          <div className="flex items-center justify-between mb-4 gap-4 shrink-0">
             <div className="flex items-center gap-4">
-              <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-pastel to-purple-500">
+              <h2 className="text-xl lg:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-pastel to-purple-500">
                 {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
               </h2>
               <div className="flex gap-1 bg-muted/50 p-1 rounded-xl">
@@ -354,27 +389,28 @@ export default function Calendar() {
             </Button>
           </div>
 
-          <div className="flex-1 overflow-auto bg-white/50 rounded-3xl p-4 border border-white/60">
-            <div className="grid grid-cols-7 gap-2 mb-2 sticky top-0 bg-white/80 backdrop-blur-sm z-10 py-2 rounded-xl">
+          {/* Grid Kalender (Scrollable Inside) */}
+          <div className="flex-1 overflow-y-auto bg-white/50 rounded-3xl p-4 border border-white/60 scrollbar-hide">
+            <div className="grid grid-cols-7 gap-2 mb-2 sticky top-0 bg-white/95 backdrop-blur-sm z-10 py-2 rounded-xl shadow-sm">
               {daysOfWeek.map(day => <div key={day} className="text-center text-sm font-bold text-muted-foreground">{day}</div>)}
             </div>
-            <div className="grid grid-cols-7 gap-2 min-h-[500px]">
+            <div className="grid grid-cols-7 gap-2 auto-rows-fr">
               {getDaysInMonth(currentDate).map((day, i) => {
                 const dayProkers = day ? getProkerForDate(day) : [];
                 return (
-                  <div key={i} onClick={() => day && handleDateClick(day)} className={cn("min-h-[100px] p-2 rounded-2xl border transition-all relative group", day ? "bg-white border-border/40 hover:border-pink-pastel/50 hover:shadow-md cursor-pointer" : "bg-muted/10 border-transparent")}>
+                  <div key={i} onClick={() => day && handleDateClick(day)} className={cn("min-h-[100px] p-2 rounded-2xl border transition-all relative group flex flex-col", day ? "bg-white border-border/40 hover:border-pink-pastel/50 hover:shadow-md cursor-pointer" : "bg-muted/10 border-transparent")}>
                     {day && (
                       <>
-                        <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center text-sm font-semibold mb-2", isToday(day) ? "bg-pink-pastel text-white shadow-sm" : "text-muted-foreground group-hover:text-foreground")}>{day}</div>
-                        <div className="space-y-1.5">
-                          {dayProkers.slice(0, 3).map(proker => (
+                        <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center text-sm font-semibold mb-2 shrink-0", isToday(day) ? "bg-pink-pastel text-white shadow-sm" : "text-muted-foreground group-hover:text-foreground")}>{day}</div>
+                        <div className="space-y-1 overflow-y-auto max-h-[80px] scrollbar-thin scrollbar-thumb-pink-100">
+                          {dayProkers.map(proker => (
                             <div key={proker.id} className={cn("text-[10px] px-2 py-1 rounded-md truncate text-white font-medium shadow-sm", getDivisionColor(proker.division))}>
                               {proker.name}
                             </div>
                           ))}
-                          {dayProkers.length > 3 && <div className="text-[10px] font-bold text-muted-foreground text-center bg-muted/50 rounded-md py-0.5">+{dayProkers.length - 3} lainnya</div>}
                         </div>
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/5 rounded-2xl">
+                        {/* Tombol Plus Saat Hover */}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/5 rounded-2xl pointer-events-none">
                               <Plus className="text-pink-pastel drop-shadow-md" size={32} />
                         </div>
                       </>
@@ -387,7 +423,7 @@ export default function Calendar() {
         </div>
       </div>
 
-      {/* DIALOGS */}
+      {/* DIALOGS (Modal Form, List, Guide) TETAP SAMA */}
       <Dialog open={isListOpen} onOpenChange={setIsListOpen}>
         <DialogContent className="sm:max-w-md rounded-3xl border-0 shadow-2xl bg-white/95 backdrop-blur-xl">
           <DialogHeader>
@@ -397,7 +433,7 @@ export default function Calendar() {
             </DialogTitle>
             <DialogDescription>Daftar kegiatan pada tanggal ini:</DialogDescription>
           </DialogHeader>
-          <div className="py-2 space-y-3 max-h-[60vh] overflow-y-auto px-1">
+          <div className="py-2 space-y-3 max-h-[60vh] overflow-y-auto px-1 scrollbar-thin">
              {selectedDateProkers.map((proker) => {
                  const isMyProker = isAdmin || proker.division === userDivision;
                  return (
@@ -424,7 +460,7 @@ export default function Calendar() {
       </Dialog>
 
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="sm:max-w-lg rounded-3xl border-0 shadow-2xl bg-white/95 backdrop-blur-xl">
+        <DialogContent className="sm:max-w-lg rounded-3xl border-0 shadow-2xl bg-white/95 backdrop-blur-xl max-h-[90vh] overflow-y-auto scrollbar-hide">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold flex items-center gap-2">
               {!canEdit ? ( <div className="flex items-center gap-2 text-muted-foreground"><Lock size={24} /> <span>Detail Program Kerja</span></div> ) : (
