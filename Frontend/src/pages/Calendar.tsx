@@ -21,7 +21,7 @@ interface Proker {
   link?: string;
 }
 
-// === KONFIGURASI DIVISI (LENGKAP) ===
+// === KONFIGURASI DIVISI ===
 const divisions = [
   { value: "wakahim", label: "Wakil Ketua Umum", color: "bg-purple-500" },
   { value: "sekretaris", label: "Sekretaris Umum", color: "bg-pink-500" },
@@ -50,7 +50,7 @@ const monthNames = [
   "Juli", "Agustus", "September", "Oktober", "November", "Desember"
 ];
 
-// === 🛠️ HELPER FIX TIMEZONE ===
+// === 🛠️ HELPER FIX TIMEZONE (Agar tanggal tidak mundur) ===
 const formatDateLocal = (date: Date) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -318,7 +318,7 @@ export default function Calendar() {
         {/* === SIDEBAR (FIXED HEIGHT, SCROLLABLE INSIDE) === */}
         <div className="w-full lg:w-64 flex-shrink-0 space-y-4 flex flex-col h-full">
           
-          {/* Card List Bulan (Scrollable) */}
+          {/* Card List Bulan */}
           <div className="card-pastel p-4 flex flex-col h-1/2 min-h-[200px]">
              <h3 className="font-bold text-foreground mb-3 text-center lg:text-left flex items-center gap-2 shrink-0">
               <CalendarIcon size={18} className="text-pink-pastel"/> 
@@ -346,7 +346,7 @@ export default function Calendar() {
             </div>
           </div>
 
-          {/* Filter Divisi (Scrollable) */}
+          {/* Filter Divisi */}
           <div className="card-pastel p-4 flex flex-col h-1/2 min-h-[200px]">
             <h3 className="font-bold text-foreground mb-3 text-sm shrink-0">Filter Divisi</h3>
             <div className="flex-1 overflow-y-auto pr-2">
@@ -363,7 +363,7 @@ export default function Calendar() {
           </div>
         </div>
 
-        {/* MAIN CALENDAR (AUTO RESIZE) */}
+        {/* MAIN CALENDAR */}
         <div className="flex-1 card-pastel p-4 lg:p-6 overflow-hidden flex flex-col shadow-lg border-white/50 h-full">
           <div className="flex items-center justify-between mb-4 gap-4 shrink-0">
             <div className="flex items-center gap-4">
@@ -386,7 +386,7 @@ export default function Calendar() {
             </Button>
           </div>
 
-          {/* Grid Kalender (Scrollable Inside) */}
+          {/* Grid Kalender */}
           <div className="flex-1 overflow-y-auto bg-white/50 rounded-3xl p-4 border border-white/60 scrollbar-hide">
             <div className="grid grid-cols-7 gap-2 mb-2 sticky top-0 bg-white/95 backdrop-blur-sm z-10 py-2 rounded-xl shadow-sm">
               {daysOfWeek.map(day => <div key={day} className="text-center text-sm font-bold text-muted-foreground">{day}</div>)}
@@ -420,11 +420,10 @@ export default function Calendar() {
         </div>
       </div>
 
-      {/* === POPUP LIST KEGIATAN (View Harian) === */}
+      {/* === POPUP LIST KEGIATAN === */}
       <Dialog open={isListOpen} onOpenChange={setIsListOpen}>
         <DialogContent className="sm:max-w-md rounded-3xl border-0 shadow-2xl bg-white/95 backdrop-blur-xl p-0 gap-0 overflow-hidden animate-in zoom-in-95 duration-300">
           
-          {/* Header Cantik */}
           <div className="bg-gradient-to-r from-pink-500/10 to-purple-500/10 p-6 border-b border-pink-100">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold flex items-center gap-3 text-gray-800">
@@ -439,7 +438,6 @@ export default function Calendar() {
             </DialogHeader>
           </div>
 
-          {/* List Content */}
           <div className="p-4 space-y-3 max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200">
              {selectedDateProkers.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
@@ -451,7 +449,6 @@ export default function Calendar() {
                     return (
                         <div key={proker.id} onClick={() => handleProkerSelect(proker)} className="group relative flex items-center justify-between p-4 rounded-2xl bg-white border border-gray-100 hover:border-pink-200 hover:shadow-md cursor-pointer transition-all duration-200 hover:scale-[1.01]">
                             <div className="flex items-center gap-4">
-                                {/* Garis Warna Divisi */}
                                 <div className={cn("w-1.5 h-10 rounded-full", getDivisionColor(proker.division))} />
                                 <div>
                                     <h4 className="font-bold text-gray-800 group-hover:text-pink-600 transition-colors line-clamp-1 text-base">{proker.name}</h4>
@@ -474,7 +471,6 @@ export default function Calendar() {
              )}
           </div>
 
-          {/* Footer Tombol Tambah */}
           <div className="p-4 border-t bg-gray-50/50">
             <Button onClick={() => selectedDate && openCreateForm(selectedDate)} className="w-full h-12 rounded-xl bg-gradient-to-r from-baby-blue to-lavender hover:opacity-90 text-white font-bold shadow-lg shadow-blue-100 transition-transform active:scale-95">
                 <Plus size={18} className="mr-2" /> Tambah Kegiatan Baru
@@ -487,9 +483,7 @@ export default function Calendar() {
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="sm:max-w-lg rounded-3xl border-0 shadow-2xl bg-white/95 backdrop-blur-xl p-0 gap-0 overflow-hidden animate-in zoom-in-95 duration-300">
           
-          {/* Header Form */}
           <div className="bg-gradient-to-r from-pink-500 to-purple-600 p-6 text-white relative overflow-hidden">
-            {/* Hiasan Background */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10" />
             
             <DialogHeader className="relative z-10">
@@ -508,10 +502,7 @@ export default function Calendar() {
             </DialogHeader>
           </div>
           
-          {/* Body Form */}
           <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto scrollbar-hide">
-            
-            {/* Alert Mode Baca Saja */}
             {!canEdit && (
                 <div className="bg-amber-50 text-amber-700 px-4 py-3 rounded-xl border border-amber-200 flex items-start gap-3 shadow-sm">
                     <AlertCircle className="shrink-0 mt-0.5 text-amber-600" size={20} />
@@ -523,7 +514,6 @@ export default function Calendar() {
             )}
 
             <div className="grid gap-5">
-              {/* Nama Proker */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Nama Kegiatan</label>
                 <Input 
@@ -535,9 +525,10 @@ export default function Calendar() {
                 />
               </div>
 
-              {/* Divisi */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Divisi Penanggung Jawab</label>
+                
+                {/* 🛠️ PERBAIKAN LOGIC DISABLED: Hanya Admin yang bisa ganti divisi kapanpun */}
                 <Select value={formData.division} onValueChange={(value) => setFormData({ ...formData, division: value })} disabled={!isAdmin || !canEdit}>
                     <SelectTrigger className="h-12 bg-gray-50/50 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-200">
                         <SelectValue placeholder="Pilih divisi..." />
@@ -555,7 +546,6 @@ export default function Calendar() {
                 {!isAdmin && <p className="text-[10px] text-muted-foreground ml-1 flex items-center gap-1"><Lock size={10} /> Otomatis sesuai divisi Anda.</p>}
               </div>
 
-              {/* Tanggal Mulai & Selesai */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                     <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1 flex items-center gap-1"><CalendarIcon size={12} /> Mulai</label>
@@ -567,7 +557,6 @@ export default function Calendar() {
                 </div>
               </div>
 
-              {/* Waktu & Link */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                     <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1 flex items-center gap-1"><Clock size={12} /> Waktu</label>
@@ -579,7 +568,6 @@ export default function Calendar() {
                 </div>
               </div>
 
-              {/* Deskripsi */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Deskripsi</label>
                 <Textarea placeholder="Tuliskan detail kegiatan di sini..." value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="min-h-[100px] bg-gray-50/50 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-200 resize-none" disabled={!canEdit} />
@@ -587,7 +575,6 @@ export default function Calendar() {
             </div>
           </div>
           
-          {/* Footer Actions */}
           <div className="p-4 border-t bg-gray-50/50 flex gap-3">
             {canEdit ? (
                 <>
