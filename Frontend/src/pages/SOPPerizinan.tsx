@@ -130,7 +130,7 @@ export default function SOPPerizinan() {
                 </div>
                 <div>
                     <h3 className="font-bold text-foreground">Batas Pengajuan SIK</h3>
-                    <p className="text-sm text-muted-foreground">Maksimal <span className="text-orange-500 font-bold">H-10 Hari Kerja</span> sebelum pelaksanaan kegiatan.</p>
+                    <p className="text-sm text-muted-foreground">Maksimal <span className="text-orange-500 font-bold">H-14 Hari Kerja</span> sebelum pelaksanaan kegiatan.</p>
                 </div>
             </div>
             <div className="card-pastel p-6 flex items-start gap-4 border-l-4 border-l-green-400">
