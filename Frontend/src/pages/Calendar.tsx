@@ -21,7 +21,7 @@ interface Proker {
   link?: string;
 }
 
-// === KONFIGURASI DIVISI ===
+// === KONFIGURASI DIVISI (LENGKAP) ===
 const divisions = [
   { value: "wakahim", label: "Wakil Ketua Umum", color: "bg-purple-500" },
   { value: "sekretaris", label: "Sekretaris Umum", color: "bg-pink-500" },
@@ -50,7 +50,7 @@ const monthNames = [
   "Juli", "Agustus", "September", "Oktober", "November", "Desember"
 ];
 
-// === 🛠️ HELPER FIX TIMEZONE (Agar tanggal tidak mundur) ===
+// === 🛠️ HELPER FIX TIMEZONE ===
 const formatDateLocal = (date: Date) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -204,7 +204,6 @@ export default function Calendar() {
   };
 
   const openCreateForm = (date: Date) => {
-    // 🛠️ FIX: Gunakan formatDateLocal
     const dateString = formatDateLocal(date); 
 
     setEditingProker(null);
@@ -226,7 +225,6 @@ export default function Calendar() {
     setFormData({
         name: proker.name,
         division: proker.division,
-        // 🛠️ FIX: Gunakan formatDateLocal saat edit
         startDate: formatDateLocal(proker.startDate),
         endDate: formatDateLocal(proker.endDate),
         time: proker.time || "",
@@ -315,7 +313,6 @@ export default function Calendar() {
 
   return (
     <MainLayout>
-      {/* Container Utama tanpa scroll (h-screen di parent MainLayout biasanya sudah ada, tapi kita kunci di sini) */}
       <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-100px)] overflow-hidden animate-fade-in pr-2 pb-2">
         
         {/* === SIDEBAR (FIXED HEIGHT, SCROLLABLE INSIDE) === */}
@@ -423,80 +420,194 @@ export default function Calendar() {
         </div>
       </div>
 
-      {/* DIALOGS (Modal Form, List, Guide) TETAP SAMA */}
+      {/* === POPUP LIST KEGIATAN (View Harian) === */}
       <Dialog open={isListOpen} onOpenChange={setIsListOpen}>
-        <DialogContent className="sm:max-w-md rounded-3xl border-0 shadow-2xl bg-white/95 backdrop-blur-xl">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold flex items-center gap-2">
-                <CalendarIcon className="text-pink-pastel" />
-                Jadwal {selectedDate?.getDate()} {selectedDate ? monthNames[selectedDate.getMonth()] : ""}
-            </DialogTitle>
-            <DialogDescription>Daftar kegiatan pada tanggal ini:</DialogDescription>
-          </DialogHeader>
-          <div className="py-2 space-y-3 max-h-[60vh] overflow-y-auto px-1 scrollbar-thin">
-             {selectedDateProkers.map((proker) => {
-                 const isMyProker = isAdmin || proker.division === userDivision;
-                 return (
-                    <div key={proker.id} onClick={() => handleProkerSelect(proker)} className="group flex items-center justify-between p-3 rounded-2xl bg-white border border-border hover:border-pink-pastel/50 hover:shadow-md cursor-pointer transition-all">
-                        <div className="flex items-center gap-3">
-                            <div className={cn("w-2 h-10 rounded-full", getDivisionColor(proker.division))} />
-                            <div>
-                                <h4 className="font-bold text-foreground group-hover:text-pink-pastel transition-colors line-clamp-1">{proker.name}</h4>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    <span className={cn("px-1.5 py-0.5 rounded text-white text-[10px] font-bold", getDivisionColor(proker.division))}>{getDivisionLabel(proker.division)}</span>
-                                    <span>• {proker.time || "-"}</span>
+        <DialogContent className="sm:max-w-md rounded-3xl border-0 shadow-2xl bg-white/95 backdrop-blur-xl p-0 gap-0 overflow-hidden animate-in zoom-in-95 duration-300">
+          
+          {/* Header Cantik */}
+          <div className="bg-gradient-to-r from-pink-500/10 to-purple-500/10 p-6 border-b border-pink-100">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold flex items-center gap-3 text-gray-800">
+                  <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-pink-500">
+                    <CalendarIcon size={20} />
+                  </div>
+                  <div>
+                    <span className="block text-sm font-normal text-muted-foreground">Jadwal Tanggal</span>
+                    {selectedDate?.getDate()} {selectedDate ? monthNames[selectedDate.getMonth()] : ""} {selectedDate?.getFullYear()}
+                  </div>
+              </DialogTitle>
+            </DialogHeader>
+          </div>
+
+          {/* List Content */}
+          <div className="p-4 space-y-3 max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200">
+             {selectedDateProkers.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                    <p>Belum ada kegiatan nih 💤</p>
+                </div>
+             ) : (
+                selectedDateProkers.map((proker) => {
+                    const isMyProker = isAdmin || proker.division === userDivision;
+                    return (
+                        <div key={proker.id} onClick={() => handleProkerSelect(proker)} className="group relative flex items-center justify-between p-4 rounded-2xl bg-white border border-gray-100 hover:border-pink-200 hover:shadow-md cursor-pointer transition-all duration-200 hover:scale-[1.01]">
+                            <div className="flex items-center gap-4">
+                                {/* Garis Warna Divisi */}
+                                <div className={cn("w-1.5 h-10 rounded-full", getDivisionColor(proker.division))} />
+                                <div>
+                                    <h4 className="font-bold text-gray-800 group-hover:text-pink-600 transition-colors line-clamp-1 text-base">{proker.name}</h4>
+                                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                                        <span className={cn("px-2 py-0.5 rounded-full text-white text-[10px] font-bold shadow-sm", getDivisionColor(proker.division))}>
+                                            {getDivisionLabel(proker.division)}
+                                        </span>
+                                        <span className="flex items-center gap-1 bg-gray-100 px-2 py-0.5 rounded-full">
+                                            <Clock size={10} /> {proker.time || "Sepanjang hari"}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
+                            <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-pink-50 group-hover:text-pink-500 transition-colors">
+                                {isMyProker ? <Edit3 size={16} /> : <Eye size={16} />}
+                            </div>
                         </div>
-                        <div className="text-muted-foreground group-hover:text-foreground">{isMyProker ? <Edit3 size={18} /> : <Eye size={18} />}</div>
-                    </div>
-                 )
-             })}
+                    )
+                })
+             )}
           </div>
-          <Button onClick={() => selectedDate && openCreateForm(selectedDate)} className="w-full h-12 rounded-xl bg-gradient-to-r from-baby-blue to-lavender text-white font-bold shadow-lg hover:opacity-90 mt-2">
-            <Plus size={18} className="mr-2" /> Tambah Proker Baru
-          </Button>
+
+          {/* Footer Tombol Tambah */}
+          <div className="p-4 border-t bg-gray-50/50">
+            <Button onClick={() => selectedDate && openCreateForm(selectedDate)} className="w-full h-12 rounded-xl bg-gradient-to-r from-baby-blue to-lavender hover:opacity-90 text-white font-bold shadow-lg shadow-blue-100 transition-transform active:scale-95">
+                <Plus size={18} className="mr-2" /> Tambah Kegiatan Baru
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 
+      {/* === POPUP FORMULIR (Create / Edit) === */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="sm:max-w-lg rounded-3xl border-0 shadow-2xl bg-white/95 backdrop-blur-xl max-h-[90vh] overflow-y-auto scrollbar-hide">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-              {!canEdit ? ( <div className="flex items-center gap-2 text-muted-foreground"><Lock size={24} /> <span>Detail Program Kerja</span></div> ) : (
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-pink-pastel to-purple-500">{editingProker ? "Edit Program Kerja" : "Tambah Program Kerja"}</span>
-              )}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-5 py-4">
-            {!canEdit && <div className="bg-amber-50 text-amber-700 px-4 py-3 rounded-xl border border-amber-100 flex items-start gap-3"><AlertCircle className="shrink-0 mt-0.5" size={18} /><div className="text-sm"><strong>Mode Baca Saja</strong><p className="opacity-90 text-xs mt-0.5">Anda hanya dapat melihat proker dari divisi lain.</p></div></div>}
-            <div className="grid gap-4">
-              <div><label className="text-sm font-bold text-foreground/80 mb-1.5 block">Nama Program Kerja</label><Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="h-12 bg-muted/20 border-border/50 rounded-xl" disabled={!canEdit} /></div>
-              <div>
-                <label className="text-sm font-bold text-foreground/80 mb-1.5 block">Divisi Penanggung Jawab</label>
-                <Select value={formData.division} onValueChange={(value) => setFormData({ ...formData, division: value })} disabled={(!isAdmin && !editingProker) || !canEdit}>
-                    <SelectTrigger className="h-12 bg-muted/20 border-border/50 rounded-xl"><SelectValue placeholder="Pilih divisi..." /></SelectTrigger>
-                    <SelectContent className="rounded-xl border-border/50 shadow-xl">
-                        {divisions.map(div => (<SelectItem key={div.value} value={div.value} className="rounded-lg my-0.5 cursor-pointer"><div className="flex items-center gap-2"><div className={cn("w-3 h-3 rounded-full shadow-sm", div.color)} />{div.label}</div></SelectItem>))}
+        <DialogContent className="sm:max-w-lg rounded-3xl border-0 shadow-2xl bg-white/95 backdrop-blur-xl p-0 gap-0 overflow-hidden animate-in zoom-in-95 duration-300">
+          
+          {/* Header Form */}
+          <div className="bg-gradient-to-r from-pink-500 to-purple-600 p-6 text-white relative overflow-hidden">
+            {/* Hiasan Background */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10" />
+            
+            <DialogHeader className="relative z-10">
+                <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+                {!canEdit ? ( 
+                    <> <Lock size={24} className="opacity-80" /> <span>Detail Proker</span> </> 
+                ) : (
+                    <> {editingProker ? <Edit3 size={24} className="opacity-80"/> : <Plus size={24} className="opacity-80"/>} 
+                       <span>{editingProker ? "Edit Program Kerja" : "Tambah Program Kerja"}</span> 
+                    </>
+                )}
+                </DialogTitle>
+                <DialogDescription className="text-white/80">
+                    {editingProker ? "Perbarui detail kegiatan ini." : "Isi detail untuk menambahkan kegiatan baru."}
+                </DialogDescription>
+            </DialogHeader>
+          </div>
+          
+          {/* Body Form */}
+          <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto scrollbar-hide">
+            
+            {/* Alert Mode Baca Saja */}
+            {!canEdit && (
+                <div className="bg-amber-50 text-amber-700 px-4 py-3 rounded-xl border border-amber-200 flex items-start gap-3 shadow-sm">
+                    <AlertCircle className="shrink-0 mt-0.5 text-amber-600" size={20} />
+                    <div className="text-sm">
+                        <strong className="font-semibold">Mode Baca Saja</strong>
+                        <p className="opacity-90 text-xs mt-0.5">Anda hanya dapat melihat proker dari divisi lain.</p>
+                    </div>
+                </div>
+            )}
+
+            <div className="grid gap-5">
+              {/* Nama Proker */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Nama Kegiatan</label>
+                <Input 
+                    value={formData.name} 
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })} 
+                    className="h-12 bg-gray-50/50 border-gray-200 focus:bg-white focus:ring-2 focus:ring-pink-200 rounded-xl transition-all font-medium" 
+                    placeholder="Contoh: Rapat Kerja Perdana"
+                    disabled={!canEdit} 
+                />
+              </div>
+
+              {/* Divisi */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Divisi Penanggung Jawab</label>
+                <Select value={formData.division} onValueChange={(value) => setFormData({ ...formData, division: value })} disabled={!isAdmin || !canEdit}>
+                    <SelectTrigger className="h-12 bg-gray-50/50 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-200">
+                        <SelectValue placeholder="Pilih divisi..." />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-gray-100 shadow-xl">
+                        {divisions.map(div => (
+                            <SelectItem key={div.value} value={div.value} className="rounded-lg my-1 cursor-pointer focus:bg-pink-50">
+                                <div className="flex items-center gap-2">
+                                    <div className={cn("w-2 h-2 rounded-full", div.color)} /> {div.label}
+                                </div>
+                            </SelectItem>
+                        ))}
                     </SelectContent>
                 </Select>
-                {!isAdmin && <p className="text-[10px] text-muted-foreground mt-1.5 ml-1 flex items-center gap-1"><Lock size={10} /> Otomatis terpilih sesuai Divisi Anda.</p>}
+                {!isAdmin && <p className="text-[10px] text-muted-foreground ml-1 flex items-center gap-1"><Lock size={10} /> Otomatis sesuai divisi Anda.</p>}
               </div>
+
+              {/* Tanggal Mulai & Selesai */}
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-sm font-bold text-foreground/80 mb-1.5 flex items-center gap-2"><CalendarIcon size={14} className="text-pink-pastel" /> Mulai</label><Input type="date" value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} className="h-12 bg-muted/20 border-border/50 rounded-xl" disabled={!canEdit} /></div>
-                <div><label className="text-sm font-bold text-foreground/80 mb-1.5 flex items-center gap-2"><CalendarIcon size={14} className="text-pink-pastel" /> Selesai</label><Input type="date" value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} className="h-12 bg-muted/20 border-border/50 rounded-xl" disabled={!canEdit} /></div>
+                <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1 flex items-center gap-1"><CalendarIcon size={12} /> Mulai</label>
+                    <Input type="date" value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} className="h-12 bg-gray-50/50 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-200" disabled={!canEdit} />
+                </div>
+                <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1 flex items-center gap-1"><CalendarIcon size={12} /> Selesai</label>
+                    <Input type="date" value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} className="h-12 bg-gray-50/50 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-200" disabled={!canEdit} />
+                </div>
               </div>
+
+              {/* Waktu & Link */}
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-sm font-bold text-foreground/80 mb-1.5 flex items-center gap-2"><Clock size={14} className="text-baby-blue" /> Waktu</label><Input type="time" value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })} className="h-12 bg-muted/20 border-border/50 rounded-xl" disabled={!canEdit} /></div>
-                <div><label className="text-sm font-bold text-foreground/80 mb-1.5 flex items-center gap-2"><Link2 size={14} className="text-baby-blue" /> Link Dokumen</label><Input placeholder="https://..." value={formData.link} onChange={(e) => setFormData({ ...formData, link: e.target.value })} className="h-12 bg-muted/20 border-border/50 rounded-xl" disabled={!canEdit} /></div>
+                <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1 flex items-center gap-1"><Clock size={12} /> Waktu</label>
+                    <Input type="time" value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })} className="h-12 bg-gray-50/50 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-200" disabled={!canEdit} />
+                </div>
+                <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1 flex items-center gap-1"><Link2 size={12} /> Link Dokumen</label>
+                    <Input placeholder="https://..." value={formData.link} onChange={(e) => setFormData({ ...formData, link: e.target.value })} className="h-12 bg-gray-50/50 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-200" disabled={!canEdit} />
+                </div>
               </div>
-              <div><label className="text-sm font-bold text-foreground/80 mb-1.5 block">Deskripsi Kegiatan</label><Textarea placeholder="Jelaskan detail kegiatan..." value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="bg-muted/20 border-border/50 rounded-xl resize-none" rows={3} disabled={!canEdit} /></div>
+
+              {/* Deskripsi */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Deskripsi</label>
+                <Textarea placeholder="Tuliskan detail kegiatan di sini..." value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="min-h-[100px] bg-gray-50/50 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-200 resize-none" disabled={!canEdit} />
+              </div>
             </div>
           </div>
-          <div className="flex gap-3 pt-2">
-            {canEdit && <Button onClick={handleSave} disabled={!formData.name || !formData.division} className="flex-1 h-12 bg-gradient-to-r from-baby-blue to-lavender hover:opacity-90 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-95">Simpan Proker</Button>}
-            <Button onClick={() => { setIsFormOpen(false); resetForm(); }} variant="outline" className="h-12 px-6 border-border text-muted-foreground hover:bg-muted rounded-xl flex-1 font-medium">{canEdit ? "Batal" : "Tutup"}</Button>
-            {editingProker && canEdit && <Button onClick={handleDelete} variant="outline" className="h-12 px-4 border-red-100 bg-red-50 text-destructive hover:bg-red-100 rounded-xl"><Trash2 size={20} /></Button>}
+          
+          {/* Footer Actions */}
+          <div className="p-4 border-t bg-gray-50/50 flex gap-3">
+            {canEdit ? (
+                <>
+                    {editingProker && (
+                        <Button onClick={handleDelete} variant="destructive" className="h-12 w-12 p-0 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700 shadow-sm" title="Hapus">
+                            <Trash2 size={20} />
+                        </Button>
+                    )}
+                    <Button onClick={() => { setIsFormOpen(false); resetForm(); }} variant="outline" className="h-12 flex-1 rounded-xl border-gray-200 hover:bg-gray-100 font-medium text-gray-600">
+                        Batal
+                    </Button>
+                    <Button onClick={handleSave} disabled={!formData.name || !formData.division} className="h-12 flex-[2] rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90 text-white font-bold shadow-lg shadow-purple-200 transition-transform active:scale-95">
+                        {editingProker ? "Simpan Perubahan" : "Buat Proker"}
+                    </Button>
+                </>
+            ) : (
+                <Button onClick={() => { setIsFormOpen(false); resetForm(); }} className="w-full h-12 rounded-xl bg-gray-800 text-white hover:bg-gray-700">
+                    Tutup
+                </Button>
+            )}
           </div>
         </DialogContent>
       </Dialog>
