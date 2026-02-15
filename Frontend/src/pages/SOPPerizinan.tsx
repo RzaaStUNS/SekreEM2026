@@ -139,7 +139,7 @@ export default function SOPPerizinan() {
                 </div>
                 <div>
                     <h3 className="font-bold text-foreground">Batas Pengumpulan SPJ/LPJ</h3>
-                    <p className="text-sm text-muted-foreground">Maksimal <span className="text-green-600 font-bold">H+14 Hari</span> setelah kegiatan selesai.</p>
+                    <p className="text-sm text-muted-foreground">Maksimal <span className="text-green-600 font-bold">H+2 Hari</span> setelah kegiatan selesai.</p>
                 </div>
             </div>
         </div>
