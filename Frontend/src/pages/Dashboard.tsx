@@ -14,6 +14,7 @@ import {
   File,
   List,
   MessageCircle,
+  PackageOpen, // Import ikon kotak terbuka
 } from "lucide-react";
 
 // --- KOMPONEN KARTU DASHBOARD ---
@@ -29,7 +30,7 @@ const DashboardCard = ({ icon, title, iconBg, to, external }: DashboardCardProps
   // Paksa icon jadi warna HITAM (text-foreground)
   // Saat hover berubah jadi Pink
   const styledIcon = React.cloneElement(icon as React.ReactElement, {
-    className: "text-foreground group-hover:text-pink-pastel transition-colors duration-300", 
+    className: "text-foreground group-hover:text-pink-pastel transition-colors duration-300",
     size: 28,
   });
 
@@ -39,7 +40,7 @@ const DashboardCard = ({ icon, title, iconBg, to, external }: DashboardCardProps
         className={cn(
           // Hapus background opacity, sekarang warnanya solid sesuai input 'iconBg'
           "w-16 h-16 rounded-3xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110",
-          iconBg 
+          iconBg
         )}
       >
         {styledIcon}
@@ -88,7 +89,7 @@ export default function Dashboard() {
   return (
     <MainLayout>
       <div className="max-w-7xl mx-auto pb-10">
-        
+
         {/* === General Info === */}
         <Section title="Informasi Umum">
           <DashboardCard
@@ -108,6 +109,14 @@ export default function Dashboard() {
             title="SOP Perizinan Proposal"
             iconBg="bg-pink-pastel" // Solid Pink Pastel
             to="/sop-perizinan"
+          />
+           {/* Update Ikon dan Link Inventarisasi */}
+           <DashboardCard
+            icon={<PackageOpen />} // Menggunakan ikon kotak terbuka
+            title="Inventarisasi"
+            iconBg="bg-pink-pastel" // Solid Pink Pastel
+            to="https://invensekre.zaza.my.id/" // Hapus '/' di depan karena link external
+            external // Tambahkan flag external agar terbuka di tab baru
           />
         </Section>
 
