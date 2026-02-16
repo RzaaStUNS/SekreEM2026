@@ -32,6 +32,7 @@ interface MenuItem {
   icon: React.ReactNode;
   label: string;
   path?: string;
+  external?: boolean; // Menambahkan support external link untuk menu utama
   children?: {
     icon: React.ReactNode;
     label: string;
@@ -68,8 +69,9 @@ const menuItems: MenuItem[] = [
   },
   {
     icon: <FileText size={20} />,
-    label: "SOP Perizinan SV",
-    path: "/sop-perizinan",
+    label: "Inventaris Sekre",
+    path: "https://invensekre.zaza.my.id/",
+    external: true, // Menandai ini sebagai link eksternal
   },
   {
     icon: <FolderOpen size={20} />,
@@ -281,17 +283,33 @@ export const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
                       )}
                     </div>
                   ) : (
-                    <Link
-                      to={item.path!}
-                      className={cn(
-                        "menu-item",
-                        isActive(item.path) && "active",
-                        !isOpen && "lg:justify-center lg:px-3"
-                      )}
-                    >
-                      {item.icon}
-                      {isOpen && <span className="text-sm">{item.label}</span>}
-                    </Link>
+                    // Logic Baru: Cek apakah external atau path dimulai dengan http
+                    item.external || item.path?.startsWith("http") ? (
+                      <a
+                        href={item.path}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cn(
+                          "menu-item",
+                          !isOpen && "lg:justify-center lg:px-3"
+                        )}
+                      >
+                        {item.icon}
+                        {isOpen && <span className="text-sm">{item.label}</span>}
+                      </a>
+                    ) : (
+                      <Link
+                        to={item.path!}
+                        className={cn(
+                          "menu-item",
+                          isActive(item.path) && "active",
+                          !isOpen && "lg:justify-center lg:px-3"
+                        )}
+                      >
+                        {item.icon}
+                        {isOpen && <span className="text-sm">{item.label}</span>}
+                      </Link>
+                    )
                   )}
                 </li>
               ))}
