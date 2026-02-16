@@ -49,7 +49,7 @@ const steps = [
   {
     number: 3,
     title: "Lampirkan Dokumen",
-    description: "Surat harus ditandatangani Ketua Kegiatan & Ketua Ormawa, serta dilampiri SIK.",
+    description: "Surat harus ditandatangani Ketua Kegiatan & Ketua Ormawa, serta dilampiri SIK.Namun jika hanya meminjam ruangan di area prodi, tanpa SIK tidak masalah",
     icon: <Building2 size={28} />,
     iconBg: "bg-lavender",
     robotPosition: "left",
