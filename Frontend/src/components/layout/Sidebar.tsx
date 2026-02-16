@@ -19,6 +19,7 @@ import {
   Settings,
   User,
   X,
+  PackageOpen,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -68,7 +69,7 @@ const menuItems: MenuItem[] = [
     path: "/kenal-administrasi",
   },
   {
-    icon: <FileText size={20} />,
+    icon: <PackageOpen size={20} />,
     label: "Inventaris Sekre",
     path: "https://invensekre.zaza.my.id/",
     external: true, // Menandai ini sebagai link eksternal
