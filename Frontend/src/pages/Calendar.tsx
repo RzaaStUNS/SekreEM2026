@@ -115,11 +115,13 @@ export default function Calendar() {
         const user = JSON.parse(storedUser);
         const email = (user.email || "").toLowerCase();
 
+        // Admin: Ketum & Waketum
         if (email.includes("ketum") && !email.includes("waketum")) {
           setIsAdmin(true);
           setUserDivision("all"); 
         } else {
           setIsAdmin(false);
+          // Mapping Divisi
           if (email.includes("waketum")) setUserDivision("wakahim");
           else if (email.includes("sekum")) setUserDivision("sekretaris");
           else if (email.includes("bendum")) setUserDivision("bendahara");
@@ -327,17 +329,32 @@ export default function Calendar() {
              <div className="grid grid-cols-7 gap-1 text-center text-xs">
                 {getDaysInMonth(currentDate).map((day, i) => {
                     const isDayToday = day ? isToday(day) : false;
-                    const hasProker = day ? getProkerForDate(day).length > 0 : false;
+                    const dayProkers = day ? getProkerForDate(day) : [];
+                    // Hapus background color proker, cukup cek today
+                    
                     return (
-                        <div key={i} className={cn(
-                            "aspect-square flex items-center justify-center rounded-full cursor-pointer transition-all",
-                            day ? "hover:bg-pink-100" : "",
-                            isDayToday ? "bg-pink-500 text-white font-bold" : "",
-                            !isDayToday && hasProker ? "bg-purple-100 text-purple-600 font-medium" : ""
-                        )}
-                        onClick={() => day && handleDateClick(day)}
-                        >
-                            {day}
+                        <div key={i} className="flex flex-col items-center gap-0.5 cursor-pointer" onClick={() => day && handleDateClick(day)}>
+                            <div className={cn(
+                                "w-6 h-6 flex items-center justify-center rounded-full transition-all text-xs font-medium",
+                                day ? "hover:bg-pink-100" : "",
+                                isDayToday ? "bg-pink-500 text-white font-bold" : "text-gray-600"
+                            )}>
+                                {day}
+                            </div>
+                            
+                            {/* 🔥 DOT DOT WARNA DIVISI DI SINI 🔥 */}
+                            {dayProkers.length > 0 && (
+                                <div className="flex gap-0.5 justify-center">
+                                    {dayProkers.slice(0, 3).map((p, idx) => (
+                                        <div 
+                                            key={idx} 
+                                            className={cn("w-1 h-1 rounded-full", getDivisionColor(p.division))} 
+                                        />
+                                    ))}
+                                    {/* Kalo lebih dari 3, kasih dot abu kecil */}
+                                    {dayProkers.length > 3 && <div className="w-1 h-1 rounded-full bg-gray-300" />}
+                                </div>
+                            )}
                         </div>
                     )
                 })}
@@ -375,7 +392,7 @@ export default function Calendar() {
             </div>
             
             <div className="flex items-center gap-2">
-                {/* Dropdown Pilih Bulan (Baru) */}
+                {/* Dropdown Pilih Bulan */}
                 <Select 
                     value={currentDate.getMonth().toString()} 
                     onValueChange={(val) => setCurrentDate(new Date(2026, parseInt(val), 1))}
