@@ -103,6 +103,11 @@ const menuItems: MenuItem[] = [
         label: "Persuratan",
         path: "/template/persuratan",
       },
+      {
+        icon: <Mail size={18} />,
+        label: "ARK",
+        path: "/template/ARK",
+      },
     ],
   },
   {
