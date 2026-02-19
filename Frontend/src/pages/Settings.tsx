@@ -13,8 +13,8 @@ import { useNavigate } from "react-router-dom";
 
 // === DATA CONTACT PERSON ===
 const admins = [
-  { name: "Abimanyu", phone: "6282133751840", role: "Admin IT" },
-  { name: "Aldifa",   phone: "6281234567890", role: "Sekretaris Umum" }, 
+  { name: "Aldifa", phone: "6282133751840", role: "Ketua Divisi Sekretaris Umum" },
+  { name: "Abimanyu",   phone: "6281234567890", role: "Sekretaris Umum" }, 
 ];
 
 interface SettingItemProps {
