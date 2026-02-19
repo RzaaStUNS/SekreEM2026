@@ -20,6 +20,7 @@ import {
   User,
   X,
   PackageOpen,
+  ShieldPlus,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -104,7 +105,7 @@ const menuItems: MenuItem[] = [
         path: "/template/persuratan",
       },
       {
-        icon: <Mail size={18} />,
+        icon: <ShieldPlus size={18} />,
         label: "ARK",
         path: "/template/ARK",
       },
