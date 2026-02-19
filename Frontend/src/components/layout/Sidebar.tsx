@@ -105,7 +105,7 @@ const menuItems: MenuItem[] = [
         path: "/template/persuratan",
       },
       {
-        icon: <ShieldPlus size={20} />,
+        icon: <ShieldPlus size={24} />,
         label: "ARK",
         path: "/template/ARK",
       },
