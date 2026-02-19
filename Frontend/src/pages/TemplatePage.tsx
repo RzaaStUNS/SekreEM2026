@@ -29,6 +29,11 @@ const templateData: Record<string, { title: string; description: string; link: s
     description: "Template surat-menyurat organisasi",
     link: "https://drive.google.com/drive/folders/1MuNlsZ3y30lzK-UoclyJGUZz8p4cZxuE",
   },
+  ARK: {
+    title: "Template ARK",
+    description: "Template Analisis Resiko Kegiatan",
+    link: "https://docs.google.com/document/d/1Q7pP-WHcQO390wJc3wXsZ231qpFfXaP_/edit?usp=sharing&ouid=117447629839833109359&rtpof=true&sd=true",
+  },
 };
 
 export default function TemplatePage() {
