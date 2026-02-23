@@ -19,7 +19,7 @@ export default function FormatLPJ() {
         </div>
 
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-pink-pastel mb-2">Format LPJ & SPJ ✅</h1>
+          <h1 className="text-3xl font-bold text-pink-pastel mb-2">Format LPJ</h1>
           <p className="text-muted-foreground">Ketentuan Laporan Pertanggungjawaban</p>
         </div>
 
@@ -31,7 +31,7 @@ export default function FormatLPJ() {
                 </div>
                 <h3 className="font-bold text-lg">Deadline Pengumpulan</h3>
                 <p className="text-sm text-muted-foreground">
-                    Paling lambat <span className="font-bold text-destructive">H+14 Hari</span> setelah kegiatan selesai dilaksanakan.
+                    Paling lambat <span className="font-bold text-destructive">H+2 Hari</span> setelah kegiatan selesai dilaksanakan.
                 </p>
             </div>
 
@@ -42,7 +42,7 @@ export default function FormatLPJ() {
                 </div>
                 <h3 className="font-bold text-lg">Surat Pernyataan</h3>
                 <p className="text-sm text-muted-foreground">
-                    Wajib dibubuhi <strong>Materai Rp 10.000</strong> pada bagian tanda tangan Ketua Kegiatan.
+                    Wajib diberi cap <strong>E-Mailkomp periode saat ini</strong> pada bagian tanda tangan Ketua Kegiatan.
                 </p>
             </div>
 
@@ -51,7 +51,7 @@ export default function FormatLPJ() {
                 <div className="w-16 h-16 bg-baby-blue/20 text-baby-blue rounded-full flex items-center justify-center">
                     <FileCheck size={32} />
                 </div>
-                <h3 className="font-bold text-lg">Kelengkapan SPJ</h3>
+                <h3 className="font-bold text-lg">Kelengkapan LPJ</h3>
                 <p className="text-sm text-muted-foreground">
                     Pastikan nota dan bukti transaksi terlampir rapi dan sesuai dengan anggaran yang diajukan.
                 </p>
