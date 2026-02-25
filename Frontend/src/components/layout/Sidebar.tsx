@@ -21,7 +21,8 @@ import {
   X,
   PackageOpen,
   ShieldPlus,
-  Hash, // Tambahan icon untuk Generate Nomor
+  Hash,
+  OctagonAlert, // Tambahan icon untuk Generate Nomor
 } from "lucide-react";
 import { useState, useEffect } from "react"; // Tambah useEffect
 import { Link, useLocation } from "react-router-dom";
@@ -130,7 +131,7 @@ const menuItems: MenuItem[] = [
   },
   // === MENU EKSKLUSIF SEKUM ===
   {
-    icon: <Hash size={20} />,
+    icon: <OctagonAlert size={20} />,
     label: "Generate Surat",
     path: "/generate-surat", // Sesuaikan dengan route halaman generatemu
     requiresSekum: true,     // Flag khusus agar disembunyikan untuk user biasa
