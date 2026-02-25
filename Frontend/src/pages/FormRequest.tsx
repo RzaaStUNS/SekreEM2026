@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 // === OPSI SESUAI SPREADSHEET ===
 const BIDANG_OPTIONS = [
-  "Ketua", "Wakil Ketua", "Sekbend", "PO", "Mawa", "Jaringan", "Litbang", "Umum (External EM)"
+  "Ketua", "Wakil Ketua", "Sekbend", "POK", "Mawa", "Jaringan", "Litbang", "Umum (External EM)"
 ];
 
 const PERIHAL_OPTIONS = [
