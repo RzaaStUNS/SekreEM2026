@@ -23,6 +23,7 @@ import SOPPeminjamanRuang from "./pages/SOPPeminjamanRuang";
 import FormatProposal from "./pages/FormatProposal";
 import FormatLPJ from "./pages/FormatLPJ";
 import KetentuanPenulisan from "./pages/KetentuanPenulisan";
+import GenerateSurat from "./pages/GenerateSurat";
 
 // ❌ KITA HAPUS INI KARENA SUDAH PINDAH KE TOKEN-BASED
 // axios.defaults.withCredentials = true; 
@@ -43,6 +44,7 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/kenal-administrasi" element={<KenalAdministrasi />} />
+          <Route path="/generate-surat" element={<GenerateSurat />} />
           
           {/* === SOP & ADMINISTRASI ROUTES (NEW) === */}
           <Route path="/sop/perizinan" element={<SOPPerizinan />} />
