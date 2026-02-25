@@ -16,7 +16,7 @@ const BIDANG_OPTIONS = [
   { value: "K", label: "Ketua Umum (K)" },
   { value: "WK", label: "Wakil Ketua Umum (WK)" },
   { value: "SB", label: "Sekretaris Bendahara (SB)" },
-  { value: "PO", label: "Pengembangan Organisasi (PO)" },
+  { value: "PO", label: "Pengembangan Organisasi Kewirausahaan(POK)" },
   { value: "JN", label: "Jaringan (JN)" },
   { value: "LB", label: "Litbang (LB)" },
   { value: "MW", label: "Kemahasiswaan (MW)" },
