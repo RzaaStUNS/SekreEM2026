@@ -115,7 +115,7 @@ dengan maksimal tanggal surat *${formatDateIndo(formData.deadline)}*`;
              <span className="text-2xl">📝</span>
           </h1>
           <p className="text-muted-foreground text-sm">
-             Isi form di bawah, data akan otomatis masuk ke Spreadsheet Sekre.
+             Isi form Request Surat di bawah, data akan otomatis tercatat di sistem.
           </p>
         </div>
 
@@ -129,7 +129,7 @@ dengan maksimal tanggal surat *${formatDateIndo(formData.deadline)}*`;
                     </div>
                     <h2 className="text-2xl font-bold text-gray-800 mb-2">Request Berhasil Disimpan! 🎉</h2>
                     <p className="text-gray-600 max-w-md mb-8">
-                        Data kamu sudah masuk ke Spreadsheet. Silakan <strong>klik salah satu CP</strong> di bawah untuk konfirmasi via WhatsApp (Pesan sudah otomatis terisi).
+                        Data kamu sudah masuk ke Data Kami. Silakan <strong>klik salah satu CP</strong> di bawah untuk konfirmasi via WhatsApp (Pesan sudah otomatis terisi).
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
