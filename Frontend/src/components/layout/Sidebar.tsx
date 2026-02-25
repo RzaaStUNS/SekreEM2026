@@ -21,8 +21,9 @@ import {
   X,
   PackageOpen,
   ShieldPlus,
+  Hash, // Tambahan icon untuk Generate Nomor
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Tambah useEffect
 import { Link, useLocation } from "react-router-dom";
 
 interface SidebarProps {
@@ -34,7 +35,8 @@ interface MenuItem {
   icon: React.ReactNode;
   label: string;
   path?: string;
-  external?: boolean; // Menambahkan support external link untuk menu utama
+  external?: boolean; 
+  requiresSekum?: boolean; // Tanda khusus menu rahasia Sekum
   children?: {
     icon: React.ReactNode;
     label: string;
@@ -44,7 +46,6 @@ interface MenuItem {
 }
 
 // === PESAN WHATSAPP TEMPLATE ===
-// Format: "Halo [Nama], aku mau tanya dong tentang..."
 const msgAbimanyu = encodeURIComponent("Halo Abimanyu, aku mau tanya dong tentang (Pertanyaanmu) ");
 const msgAldifa = encodeURIComponent("Halo Aldifa, aku mau tanya dong tentang (Pertanyaanmu) ");
 
@@ -73,7 +74,7 @@ const menuItems: MenuItem[] = [
     icon: <PackageOpen size={20} />,
     label: "Inventaris Sekre",
     path: "https://invensekre.zaza.my.id/",
-    external: true, // Menandai ini sebagai link eksternal
+    external: true, 
   },
   {
     icon: <FolderOpen size={20} />,
@@ -127,6 +128,13 @@ const menuItems: MenuItem[] = [
       },
     ],
   },
+  // === MENU EKSKLUSIF SEKUM ===
+  {
+    icon: <Hash size={20} />,
+    label: "Generate Surat",
+    path: "/generate-surat", // Sesuaikan dengan route halaman generatemu
+    requiresSekum: true,     // Flag khusus agar disembunyikan untuk user biasa
+  },
   {
     icon: <MessageCircle size={20} />,
     label: "Contact Person",
@@ -134,14 +142,12 @@ const menuItems: MenuItem[] = [
       {
         icon: <MessageCircle size={18} />,
         label: "Chat Abimanyu",
-        // URL WA Langsung dengan Pesan
         path: `https://wa.me/6282133751840?text=${msgAbimanyu}`, 
         external: true,
       },
       {
         icon: <MessageCircle size={18} />,
         label: "Chat Aldifa",
-        // URL WA Langsung dengan Pesan
         path: `https://wa.me/6285720243561?text=${msgAldifa}`, 
         external: true,
       },
@@ -155,6 +161,27 @@ export const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
     "Request Surat",
     "Contact Person",
   ]);
+  
+  // State untuk menyimpan role Sekum
+  const [isSekum, setIsSekum] = useState(false);
+
+  // === LOGIC DETEKSI ROLE ===
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user_data");
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        const email = (user.email || "").toLowerCase();
+        
+        // Deteksi jika email adalah sekum/sekretaris
+        if (email.includes("sekum") || email.includes("sekretaris")) {
+          setIsSekum(true);
+        }
+      } catch (e) {
+        console.error("Gagal membaca user_data", e);
+      }
+    }
+  }, []);
 
   const toggleMenu = (label: string) => {
     setExpandedMenus((prev) =>
@@ -220,7 +247,10 @@ export const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto py-4 px-3 scrollbar-pastel">
             <ul className="space-y-1">
-              {menuItems.map((item) => (
+              {menuItems
+                // === FILTER: Tampilkan menu biasa, atau menu sekum JIKA usernya sekum ===
+                .filter(item => !item.requiresSekum || isSekum) 
+                .map((item) => (
                 <li key={item.label}>
                   {item.children ? (
                     <div>
@@ -290,7 +320,6 @@ export const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
                       )}
                     </div>
                   ) : (
-                    // Logic Baru: Cek apakah external atau path dimulai dengan http
                     item.external || item.path?.startsWith("http") ? (
                       <a
                         href={item.path}
