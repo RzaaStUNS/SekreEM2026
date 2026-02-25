@@ -20,7 +20,6 @@ const BIDANG_OPTIONS = [
   { value: "JN", label: "Jaringan (JN)" },
   { value: "LB", label: "Litbang (LB)" },
   { value: "MW", label: "Kemahasiswaan (MW)" },
-  { value: "U", label: "Uki (U)" },
 ];
 
 const SIFAT_OPTIONS = [
