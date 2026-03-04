@@ -235,7 +235,7 @@ dengan maksimal tanggal surat *${formatDateIndo(formData.deadline)}*`;
                                 </label>
                                 <Input 
                                     required 
-                                    placeholder="Misal: Gedung PKM, Ruang Seminar 1, dsb." 
+                                    placeholder="Misal: Ruangan Lab Jaringan, Ruangan Teaching Factory, Ruangan Mixed Reality,DLL." 
                                     value={formData.lokasi} 
                                     onChange={(e) => handleChange("lokasi", e.target.value)} 
                                     className="h-12 bg-purple-50/50 border-purple-200 focus:ring-purple-300 rounded-xl" 
