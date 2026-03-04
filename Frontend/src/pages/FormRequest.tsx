@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { FileText, Send, User, Calendar, MessageCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { FileText, Send, User, Calendar, MessageCircle, CheckCircle2, Loader2, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // === OPSI SESUAI SPREADSHEET ===
@@ -35,7 +35,8 @@ export default function FormRequest() {
     tujuan: "",
     kegiatan: "",
     tglPelaksanaan: "",
-    deadline: ""
+    deadline: "",
+    lokasi: "" // Field tambahan untuk lokasi
   });
 
   // Handler Input
@@ -53,20 +54,24 @@ export default function FormRequest() {
         return;
     }
 
+    // Validasi tambahan jika pilih peminjaman tempat
+    if(formData.perihal === "Peminjaman Tempat" && !formData.lokasi) {
+        alert("Harap isi lokasi tempat yang ingin dipinjam!");
+        return;
+    }
+
     setIsLoading(true);
 
     try {
-      // 🚀 URL APPS SCRIPT MILIKMU SUDAH DIPASANG DI SINI 🚀
       const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyUE_BCEGzgFvYhOp3l64J4sHDdRqsyv3vZD0kZFhMVCsngocv28QzLjU-j7EAEiZc/exec";
 
       await fetch(SCRIPT_URL, {
         method: "POST",
-        mode: "no-cors", // Wajib untuk Google Apps Script
+        mode: "no-cors", 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
       });
 
-      // Munculkan layar sukses
       setIsSuccess(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -80,20 +85,21 @@ export default function FormRequest() {
 
   // Logic Generate Pesan WA
   const handleContactCP = (cpName: string, cpNumber: string) => {
-    // Format Tanggal (misal: 2026-03-17 jadi 17 Maret 2026)
     const formatDateIndo = (dateStr: string) => {
         if(!dateStr) return "-";
         const date = new Date(dateStr);
         return date.toLocaleDateString("id-ID", { day: 'numeric', month: 'long', year: 'numeric' });
     };
 
-    // Template Pesan WA Otomatis
+    // Template Pesan WA dengan baris lokasi (hanya jika ada)
+    const lokasiText = formData.perihal === "Peminjaman Tempat" ? `di *${formData.lokasi}*` : "";
+
     const text = `Halo ${cpName},
 
 Aku *${formData.nama}* dengan nomor wa *${formData.wa}* mau request *${formData.jenisRequest}*
 
 untuk acara proker bidang *${formData.bidang}*
-dengan perihal/isi *${formData.perihal}*
+dengan perihal/isi *${formData.perihal}* ${lokasiText}
 dengan tujuan surat *${formData.tujuan || "-"}*
 dan untuk *${formData.kegiatan || "-"}*
 
@@ -119,7 +125,7 @@ dengan maksimal tanggal surat *${formatDateIndo(formData.deadline)}*`;
           </p>
         </div>
 
-        <div className="card-pastel overflow-hidden shadow-xl border-white/50 bg-white/80 backdrop-blur-md">
+        <div className="card-pastel overflow-hidden shadow-xl border-white/50 bg-white/80 backdrop-blur-md rounded-3xl border">
             
             {/* === SCREEN 2: SUKSES & KONFIRMASI WA === */}
             {isSuccess ? (
@@ -129,7 +135,7 @@ dengan maksimal tanggal surat *${formatDateIndo(formData.deadline)}*`;
                     </div>
                     <h2 className="text-2xl font-bold text-gray-800 mb-2">Request Berhasil Disimpan! 🎉</h2>
                     <p className="text-gray-600 max-w-md mb-8">
-                        Data kamu sudah masuk ke Data Kami. Silakan <strong>klik salah satu CP</strong> di bawah untuk konfirmasi via WhatsApp (Pesan sudah otomatis terisi).
+                        Data kamu sudah masuk ke sistem. Silakan <strong>klik salah satu CP</strong> di bawah untuk konfirmasi via WhatsApp.
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
@@ -150,7 +156,10 @@ dengan maksimal tanggal surat *${formatDateIndo(formData.deadline)}*`;
                     <Button 
                         variant="ghost" 
                         className="mt-6 text-muted-foreground hover:bg-transparent hover:text-pink-500"
-                        onClick={() => { setIsSuccess(false); setFormData({ nama: "", wa: "", jenisRequest: "", bidang: "", perihal: "", tujuan: "", kegiatan: "", tglPelaksanaan: "", deadline: "" }); }}
+                        onClick={() => { 
+                          setIsSuccess(false); 
+                          setFormData({ nama: "", wa: "", jenisRequest: "", bidang: "", perihal: "", tujuan: "", kegiatan: "", tglPelaksanaan: "", deadline: "", lokasi: "" }); 
+                        }}
                     >
                         Buat Request Lain
                     </Button>
@@ -186,7 +195,6 @@ dengan maksimal tanggal surat *${formatDateIndo(formData.deadline)}*`;
                             <FileText size={20}/> Detail Surat
                         </h3>
                         
-                        {/* Jenis Request (Radio) */}
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-gray-500 uppercase ml-1">Mau request apa nih? <span className="text-red-500">*</span></label>
                             <RadioGroup value={formData.jenisRequest} onValueChange={(val) => handleChange("jenisRequest", val)} className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -219,6 +227,22 @@ dengan maksimal tanggal surat *${formatDateIndo(formData.deadline)}*`;
                             </div>
                         </div>
 
+                        {/* INPUT DINAMIS UNTUK PEMINJAMAN TEMPAT */}
+                        {formData.perihal === "Peminjaman Tempat" && (
+                            <div className="space-y-1.5 animate-in slide-in-from-top-2 duration-300">
+                                <label className="text-xs font-bold text-purple-600 uppercase ml-1 flex items-center gap-1">
+                                    <MapPin size={14} /> Nama Tempat/Ruangan <span className="text-red-500">*</span>
+                                </label>
+                                <Input 
+                                    required 
+                                    placeholder="Misal: Gedung PKM, Ruang Seminar 1, dsb." 
+                                    value={formData.lokasi} 
+                                    onChange={(e) => handleChange("lokasi", e.target.value)} 
+                                    className="h-12 bg-purple-50/50 border-purple-200 focus:ring-purple-300 rounded-xl" 
+                                />
+                            </div>
+                        )}
+
                         <div className="grid md:grid-cols-2 gap-5">
                             <div className="space-y-1.5">
                                 <label className="text-xs font-bold text-gray-500 uppercase ml-1">Tujuan Surat</label>
@@ -242,7 +266,7 @@ dengan maksimal tanggal surat *${formatDateIndo(formData.deadline)}*`;
                                 <Input type="date" value={formData.tglPelaksanaan} onChange={(e) => handleChange("tglPelaksanaan", e.target.value)} className="h-12 bg-white border-blue-100 rounded-xl" />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-gray-500 uppercase ml-1 text-red-500">Deadline Request (H-1) <span className="text-red-500">*</span></label>
+                                <label className="text-xs font-bold text-red-500 uppercase ml-1">Deadline Request (H-1) <span className="text-red-500">*</span></label>
                                 <Input required type="date" value={formData.deadline} onChange={(e) => handleChange("deadline", e.target.value)} className="h-12 bg-white border-red-200 focus:ring-red-200 rounded-xl" />
                             </div>
                         </div>
