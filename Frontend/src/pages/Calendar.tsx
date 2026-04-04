@@ -60,7 +60,7 @@ const formatDateLocal = (date: Date) => {
 
 export default function Calendar() {
   // === CONFIG API ===
-  const API_BASE_URL = import.meta.env.VITE_API_URL;
+  const API_BASE_URL = "https://sekreem2026-production.up.railway.app/api"; 
   const API_URL = `${API_BASE_URL}/prokers`; 
 
   const [currentDate, setCurrentDate] = useState(new Date(2026, 0, 1));
