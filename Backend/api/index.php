@@ -1,4 +1,17 @@
 <?php
+
+// --- CHEAT CODE CORS VERCEL (WAJIB PALING ATAS) ---
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+
+// Cegat preflight request (OPTIONS) dari browser dan langsung kasih izin 200 OK
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+// --------------------------------------------------
+
 // Paksa respon JSON agar tidak error View
 $_SERVER['HTTP_ACCEPT'] = 'application/json';
 
