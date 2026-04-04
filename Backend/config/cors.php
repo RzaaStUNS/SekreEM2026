@@ -22,6 +22,6 @@ return [
 'allowed_headers' => ['*'],
 'exposed_headers' => [],
 'max_age' => 0,
-'supports_credentials' => true, // <-- Ubah jadi true
+'supports_credentials' => false, // <-- Ubah jadi true
 
 ];
