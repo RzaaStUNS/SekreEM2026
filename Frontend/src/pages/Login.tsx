@@ -13,9 +13,8 @@ import thinkingImg from "@/assets/mascot/thinking.png";
 
 export default function Login() {
   // --- KONFIGURASI API BARU (TOKEN BASED) ---
-  const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL.replace('/api', ''),
-    // withCredentials: true,  <-- INI KITA HAPUS BIAR GA CONFLICT CSRF
+const api = axios.create({
+    baseURL: "https://api-websekre.vercel.app", // <--- LANGSUNG TEMBAK GINI AJA
     headers: {
       "Content-Type": "application/json",
       "Accept": "application/json",
