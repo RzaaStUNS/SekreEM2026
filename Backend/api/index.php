@@ -16,6 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Paksa respon JSON agar tidak error View
 $_SERVER['HTTP_ACCEPT'] = 'application/json';
 
+// 🔥 FIX VERCEL PATH INFO (BIAR KATA "/api" NGGAK DIPOTONG) 🔥
+$_SERVER['SCRIPT_NAME'] = '/index.php';
+
 // 1. Bikin folder /tmp/storage duluan SEBELUM Laravel nyala
 $storagePath = '/tmp/storage';
 if (!is_dir($storagePath)) {
